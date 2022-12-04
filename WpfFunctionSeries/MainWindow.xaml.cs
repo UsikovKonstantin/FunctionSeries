@@ -30,25 +30,11 @@ namespace WpfFunctionSeries
             
             
         }
-
-        private void Tx_Terms_Input_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            
-        }
-
+        
         private void General_Calc(object sender, RoutedEventArgs e)
         {
             
         }
 
-        private void Tx_Per_Input_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            
-        }
-
-        private void Tx_Fun_Input_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            
-        }
     }
 }

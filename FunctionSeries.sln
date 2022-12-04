@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionSeriesConsoleApp", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionSeriesClassLibrary", "FunctionSeriesClassLibrary\FunctionSeriesClassLibrary.csproj", "{3708F403-4726-40CC-81C5-118DDF608A8F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfFunctionSeries", "WpfFunctionSeries\WpfFunctionSeries.csproj", "{C35B8EEC-2EB5-40AC-8986-C5EF3E46031B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3708F403-4726-40CC-81C5-118DDF608A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3708F403-4726-40CC-81C5-118DDF608A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3708F403-4726-40CC-81C5-118DDF608A8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C35B8EEC-2EB5-40AC-8986-C5EF3E46031B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C35B8EEC-2EB5-40AC-8986-C5EF3E46031B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C35B8EEC-2EB5-40AC-8986-C5EF3E46031B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C35B8EEC-2EB5-40AC-8986-C5EF3E46031B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

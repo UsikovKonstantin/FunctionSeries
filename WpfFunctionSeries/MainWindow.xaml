@@ -8,7 +8,7 @@
         Title="Fourier Transforms" Height="800" Width="1200">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="200"/>
+            <RowDefinition Height="150"/>
             <RowDefinition Height="200*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -16,29 +16,36 @@
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="50"/>
-                <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Header="Функция">
-                <TextBox x:Name="Tx_Fun_Input"/>
-            </GroupBox>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="110"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0" Header="Функция">
+                    <TextBox x:Name="Tx_Fun_Input" TextChanged="Tx_Fun_Input_OnTextChanged"/>
+                </GroupBox>
+                <GroupBox Grid.Column="1" Header="Период функции">
+                    <TextBox x:Name="Tx_Per_Input" Text="3.14" TextChanged="Tx_Per_Input_OnTextChanged"/>
+                </GroupBox>
+            </Grid>
+            
             <GroupBox Grid.Row="1" Header="Тип разложения функции">
                 <StackPanel Orientation="Horizontal">
-                    <RadioButton Content="По косинусам (функция симметрична относительно горизонтали)"/>
-                    <RadioButton Content="По синусам (функция симметрична относительно вертикали)"/>
-                    <RadioButton Content="Функция аморфна (не обладает симметрией)"/>
+                    <RadioButton Name="Rb_Cos" Content="По косинусам (функция симметрична относительно горизонтали)" Click="General_Calc"/>
+                    <RadioButton Name="Rb_Sin" Content="По синусам (функция симметрична относительно вертикали)" Click="General_Calc"/>
+                    <RadioButton Name="Rb_Asym" Content="Функция аморфна (не обладает симметрией)" IsChecked="True" Click="General_Calc"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Grid.Row="2" Header="Период функции">
-                <TextBox x:Name="Tx_Per_Input"/>
-            </GroupBox>
-            <GroupBox Grid.Row="3" Header="Степень разложения в ряд Фурье">
+            
+            <GroupBox Grid.Row="2" Header="Степень разложения в ряд Фурье">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox x:Name="Tx_Terms_Input" Grid.Column="0" Text="5"/>
-                    <ScrollBar Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5"/>
+                    <TextBox x:Name="Tx_Terms_Input" Grid.Column="0" Text="5" TextChanged="Tx_Terms_Input_OnTextChanged"/>
+                    <ScrollBar Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5" Name="Scr_Pow" ValueChanged="Scr_Pow_OnValueChanged"/>
                 </Grid>
             </GroupBox>
         </Grid>

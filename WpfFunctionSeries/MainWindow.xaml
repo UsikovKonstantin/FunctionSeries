@@ -5,8 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfFunctionSeries"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Fourier Transforms" Height="800" Width="1200">
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="200*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Header="Функция">
+                <TextBox x:Name="Tx_Fun_Input"/>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Тип разложения функции">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="По косинусам (функция симметрична относительно горизонтали)"/>
+                    <RadioButton Content="По синусам (функция симметрична относительно вертикали)"/>
+                    <RadioButton Content="Функция аморфна (не обладает симметрией)"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="2" Header="Период функции">
+                <TextBox x:Name="Tx_Per_Input"/>
+            </GroupBox>
+            <GroupBox Grid.Row="3" Header="Степень разложения в ряд Фурье">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="Tx_Terms_Input" Grid.Column="0" Text="5"/>
+                    <ScrollBar Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <WpfPlot Grid.Row="1" x:Name="W_Plot"/>
     </Grid>
 </Window>

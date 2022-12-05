@@ -42,11 +42,58 @@ namespace WpfFunctionSeries
         {
             if (!IsInitialized) return;
             checks_terms();
+            checks_period();
         }
 
         void checks_terms()
         {
-            
+            List<char> symbols = new(Tx_Terms_Input.Text);
+            for (var index = 0; index < symbols.Count; index++)
+            {
+                var chars = symbols[index];
+                if (chars < '0' || chars > '9')
+                {
+                    symbols.RemoveAt(index);
+                    index--;
+                }
+            }
+
+            string corr = new(symbols.ToArray());
+            if (corr.Length == 0) corr = "5";
+            Tx_Terms_Input.Text = corr;
+            if (int.Parse(corr) < 101) Scr_Pow.Value = int.Parse(corr);
+        }
+
+        void checks_period()
+        {
+            List<char> symbols = new(Tx_Per_Input.Text);
+            for (var index = 0; index < symbols.Count; index++)
+            {
+                var chars = symbols[index];
+                if ((chars < '0' || chars > '9') && chars != '.')
+                {
+                    symbols.RemoveAt(index);
+                    index--;
+                }
+            }
+
+            int dot_counter = 0;
+            for (var index = 0; index < symbols.Count; index++)
+            {
+                var chars = symbols[index];
+                if (chars == '.')
+                {
+                    dot_counter++;
+                    if (dot_counter >= 2)
+                    {
+                        symbols.RemoveAt(index);
+                        index--;
+                    }
+                }
+            }
+            string corr = new(symbols.ToArray());
+            if (corr.Length == 0) corr = "3.14";
+            Tx_Per_Input.Text = corr;
         }
         private void Bt_Help_OnClick(object sender, RoutedEventArgs e)
         {

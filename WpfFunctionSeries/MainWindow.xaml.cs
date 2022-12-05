@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FunctionSeriesClassLibrary;
 
 namespace WpfFunctionSeries
 {
@@ -29,7 +30,7 @@ namespace WpfFunctionSeries
         private void Scr_Pow_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (!IsInitialized) return;
-            if (Math.Abs(Math.Round(Scr_Pow.Value) - prev_scroll_value) > 0.1)
+            if (Math.Abs(Math.Round(Scr_Pow.Value) - prev_scroll_value) > 0.9)
             {
                 prev_scroll_value = (int)Math.Round(Scr_Pow.Value);
                 Tx_Terms_Input.Text = prev_scroll_value.ToString();
@@ -43,6 +44,8 @@ namespace WpfFunctionSeries
             if (!IsInitialized) return;
             checks_terms();
             checks_period();
+            if (!checks_Fun()) return;
+                
         }
 
         void checks_terms()
@@ -94,6 +97,31 @@ namespace WpfFunctionSeries
             string corr = new(symbols.ToArray());
             if (corr.Length == 0) corr = "3.14";
             Tx_Per_Input.Text = corr;
+        }
+
+        bool checks_Fun()
+        {
+            try
+            {
+                Dictionary<char, double> t = new();
+                t.Add('x',0.5);
+                string function = convert_to_interpret(Tx_Fun_Input.Text);
+                Interpreter.SolvePolishExpression(Interpreter.GetPolishExpression(function), t);
+                Tx_Fun_Input.ToolTip = "";
+                Tx_Fun_Input.Background = Brushes.White;
+                return true;
+            }
+            catch (Exception)
+            {
+                Tx_Fun_Input.ToolTip = "Функция записана неверно.";
+                Tx_Fun_Input.Background = Brushes.Red;
+                return false;
+            }
+        }
+
+        string convert_to_interpret(string function)
+        {
+            return function.Replace("sqrt", "√");
         }
         private void Bt_Help_OnClick(object sender, RoutedEventArgs e)
         {

@@ -10,6 +10,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="150"/>
             <RowDefinition Height="200*"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
@@ -50,5 +51,10 @@
             </GroupBox>
         </Grid>
         <WpfPlot Grid.Row="1" x:Name="W_Plot"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button Name="Bt_Help" Click="Bt_Help_OnClick"><StackPanel Orientation="Horizontal"><Image Source="Help.png"/><TextBlock VerticalAlignment="Center" Text="Справка"/></StackPanel></Button>
+            <Button Name="Bt_Approx" Click="Bt_Approx_OnClick"><StackPanel Orientation="Horizontal"><Image Source="Approx.png"/><TextBlock VerticalAlignment="Center" Text="Получение ряда по точкам"/></StackPanel></Button>
+            <Button Name="Bt_Text" Click="Bt_Text_OnClick"><StackPanel Orientation="Horizontal"><Image Source="Sum.png"/><TextBlock VerticalAlignment="Center" Text="Текстовый вывод ряда"/></StackPanel></Button>
+        </StackPanel>
     </Grid>
 </Window>

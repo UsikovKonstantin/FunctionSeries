@@ -63,6 +63,7 @@ namespace WpfFunctionSeries
 
             string corr = new(symbols.ToArray());
             if (corr.Length == 0) corr = "5";
+            if (corr == "0") corr = "1";
             Tx_Terms_Input.Text = corr;
             if (int.Parse(corr) < 101) Scr_Pow.Value = int.Parse(corr);
         }
@@ -96,6 +97,7 @@ namespace WpfFunctionSeries
             }
             string corr = new(symbols.ToArray());
             if (corr.Length == 0) corr = "3.14";
+            if (corr == "0") corr = "3.14";
             Tx_Per_Input.Text = corr;
         }
 
@@ -119,23 +121,26 @@ namespace WpfFunctionSeries
             }
         }
 
-        string convert_to_interpret(string function)
-        {
-            return function.Replace("sqrt", "√");
-        }
+        string convert_to_interpret(string function) => function.Replace("sqrt", "√");
+        
         private void Bt_Help_OnClick(object sender, RoutedEventArgs e)
         {
             if (!IsInitialized) return;
+            new Help().Show();
         }
 
         private void Bt_Approx_OnClick(object sender, RoutedEventArgs e)
         {
             if (!IsInitialized) return;
+            new Approx().Show();
         }
 
         private void Bt_Text_OnClick(object sender, RoutedEventArgs e)
         {
             if (!IsInitialized) return;
+            if (Rb_Sin.IsChecked.Value) new Text_repr(int.Parse(Tx_Terms_Input.Text),Double.Parse(Tx_Per_Input.Text),Tx_Fun_Input.Text,FourierSeriesType.Sin).Show();
+            if (Rb_Cos.IsChecked.Value) new Text_repr(int.Parse(Tx_Terms_Input.Text),Double.Parse(Tx_Per_Input.Text),Tx_Fun_Input.Text,FourierSeriesType.Cos).Show();
+            if (Rb_Asym.IsChecked.Value) new Text_repr(int.Parse(Tx_Terms_Input.Text),Double.Parse(Tx_Per_Input.Text),Tx_Fun_Input.Text,FourierSeriesType.CosSin).Show();
         }
     }
 }

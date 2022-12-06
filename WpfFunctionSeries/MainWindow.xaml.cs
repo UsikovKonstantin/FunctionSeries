@@ -51,15 +51,16 @@ namespace WpfFunctionSeries
             FourierSeries fs = new(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text), Tx_Fun_Input.Text,
                 type);
             double right_x = double.Parse(Tx_Per_Input.Text)*4;
-            double step = (right_x * 2) / 1000;
-            List<(double x, double y)> points = new(1000);
+            const int num_points = 100000;
+            double step = (right_x * 2) / num_points;
+            List<(double x, double y)> points = new(num_points);
             for (double i = -right_x; i <= right_x; i+= step)
             {
                 points.Add((i,fs.Compute(i)));
             }
             W_Plot.Plot.Clear();
-            double[] xs = new double[1000], ys = new double[1000];
-            for (var index = 0; index < 1000; index++)
+            double[] xs = new double[num_points], ys = new double[num_points];
+            for (var index = 0; index < num_points; index++)
             {
                 var point = points[index];
                 xs[index] = point.x;

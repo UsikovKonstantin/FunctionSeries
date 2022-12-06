@@ -1,4 +1,5 @@
 ﻿using FunctionSeriesClassLibrary;
 
-Console.WriteLine(1);
-Console.WriteLine(new FourierSeries(5,3.14,"x",FourierSeriesType.CosSin));
+FourierSeries fs = new FourierSeries(10, 6.28, "x", FourierSeriesType.Sin);
+Console.WriteLine(fs);
+Console.WriteLine(fs.Compute(2));

@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+﻿
 
 namespace FunctionSeriesClassLibrary
 {
@@ -23,6 +23,7 @@ namespace FunctionSeriesClassLibrary
         private int n = 0;  // количество членов
         private double period = 0;  // период функции
         private string function = "";  // функция, по которой строится ряд
+        private string polFunc = "";  // польская запись
         private double[] a = new double[0];  // коэффициенты при косинусах 
         private double[] b = new double[0];  // коэффициенты при синусах
         private FourierSeriesType type = FourierSeriesType.CosSin;  // тип ряда
@@ -68,6 +69,37 @@ namespace FunctionSeriesClassLibrary
             this.type = type;
             a = new double[n + 1];
             b = new double[n + 1];
+            polFunc = Interpreter.GetPolishExpression(function);
+
+            if (type == FourierSeriesType.Sin)
+                for (int i = 1; i <= n; i++)
+                    b[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", 0, period / 2, 1000);
+            else if (type == FourierSeriesType.Cos)
+                for (int i = 0; i <= n; i++)
+                    a[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", 0, period / 2, 1000);
+            else
+            {
+                for (int i = 1; i <= n; i++)
+                    b[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", 0, period / 2, 1000);
+                for (int i = 0; i <= n; i++)
+                    a[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", 0, period / 2, 1000);
+            }
+        }
+
+        /// <summary>
+        /// Вычисление значения в точке.
+        /// </summary>
+        /// <param name="x"> точка, в которой необходимо вычислить значение </param>
+        /// <returns> значение ряда Фурье </returns>
+        public double Compute(double x)
+        { 
+            double res = a[0] / 2;
+            for (int i = 1; i <= n; i++)
+            {
+                res += a[i] * Math.Cos(i * Math.PI / period * 2 * x);
+                res += b[i] * Math.Sin(i * Math.PI / period * 2 * x);
+            }
+            return res;
         }
 
         /// <summary>
@@ -82,18 +114,18 @@ namespace FunctionSeriesClassLibrary
             {
                 if (a[j] != 0)
                     if (a[j] == 1)
-                        res += " + Cos(" + (j == 1 ? "" : j) + "x)";
+                        res += " + Cos(" + (j * Math.PI / period * 2) + "x)";
                     else if (a[j] == -1)
-                        res += " - Cos(" + (j == 1 ? "" : j) + "x)";
+                        res += " - Cos(" + (j * Math.PI / period * 2) + "x)";
                     else
-                        res += (a[j] > 0 ? " + " : " - ") + Math.Abs(a[j]) + "*" + "Cos(" + (j == 1 ? "" : j) + "x)";
+                        res += (a[j] > 0 ? " + " : " - ") + Math.Abs(a[j]) + "*" + "Cos(" + (j * Math.PI / period * 2) + "x)";
                 if (b[j] != 0)
                     if (b[j] == 1)
-                        res += " + Sin(" + (j == 1 ? "" : j) + "x)";
+                        res += " + Sin(" + (j * Math.PI / period * 2) + "x)";
                     else if (b[j] == -1)
-                        res += " - Sin(" + (j == 1 ? "" : j) + "x)";
+                        res += " - Sin(" + (j * Math.PI / period * 2) + "x)";
                     else
-                        res += (b[j] > 0 ? " + " : " - ") + Math.Abs(b[j]) + "*" + "Sin(" + (j == 1 ? "" : j) + "x)";
+                        res += (b[j] > 0 ? " + " : " - ") + Math.Abs(b[j]) + "*" + "Sin(" + (j * Math.PI / period * 2) + "x)";
             }
             return res;
         }
@@ -113,30 +145,54 @@ namespace FunctionSeriesClassLibrary
                 if (a[i] != 0)
                 {
                     if (a[i] == 1)
-                        res = "Cos(" + (i == 1 ? "" : i) + "x)";
+                        res = "Cos(" + (i * Math.PI / period * 2) + "x)";
                     else if (a[i] == -1)
-                        res = "-Cos(" + (i == 1 ? "" : i) + "x)";
+                        res = "-Cos(" + (i * Math.PI / period * 2) + "x)";
                     else
-                        res = a[i] + "*" + "Cos(" + (i == 1 ? "" : i) + "x)";
+                        res = a[i] + "*" + "Cos(" + (i * Math.PI / period * 2) + "x)";
                     if (b[i] != 0)
                         if (b[i] == 1)
-                            res += " + Sin(" + (i == 1 ? "" : i) + "x)";
+                            res += " + Sin(" + (i * Math.PI / period * 2) + "x)";
                         else if (b[i] == -1)
-                            res += " - Sin(" + (i == 1 ? "" : i) + "x)";
+                            res += " - Sin(" + (i * Math.PI / period * 2) + "x)";
                         else
-                            res += " + " + b[i] + "*" + "Sin(" + (i == 1 ? "" : i) + "x)";
+                            res += " + " + b[i] + "*" + "Sin(" + (i * Math.PI / period * 2) + "x)";
                     return res;
                 }
                 if (b[i] != 0)
                 {
                     if (b[i] == 1)
-                        res = "Sin(" + (i == 1 ? "" : i) + "x)";
+                        res = "Sin(" + (i * Math.PI / period * 2) + "x)";
                     else if (b[i] == -1)
-                        res = "-Sin(" + (i == 1 ? "" : i) + "x)";
+                        res = "-Sin(" + (i * Math.PI / period * 2) + "x)";
                     else
-                        res = b[i] + "*" + "Sin(" + (i == 1 ? "" : i) + "x)";
+                        res = b[i] + "*" + "Sin(" + (i * Math.PI / period * 2) + "x)";
                     return res;
                 }
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// Вычисление интеграла.
+        /// </summary>
+        /// <param name="a"> начальный предел интегрирования </param>
+        /// <param name="b"> конечный предел интегрирования </param>
+        /// <param name="steps"> количество шагов </param>
+        /// <returns> значение интеграла </returns>
+        public double Integral(string polFunc, double a, double b, int steps)
+        {
+            double i = a; 
+            double step = (b - a) / steps;  // ширина шага
+            double res = 0;
+            double prev = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', a } });
+            double next;
+            while (i < b)
+            {
+                next = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', i + step } });
+                res += 0.5 * step * (prev + next);
+                prev = next;
+                i += step;
             }
             return res;
         }

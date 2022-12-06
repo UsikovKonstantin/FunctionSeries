@@ -7,6 +7,6 @@
         mc:Ignorable="d"
         Title="Text_repr" Height="450" Width="800">
     <Grid>
-        <TextBlock Name="Block"/>
+        <TextBlock Name="Block" TextWrapping="Wrap"/>
     </Grid>
 </Window>

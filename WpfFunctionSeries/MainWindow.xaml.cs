@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,7 +82,7 @@ namespace WpfFunctionSeries
             for (var index = 0; index < symbols.Count; index++)
             {
                 var chars = symbols[index];
-                if ((chars < '0' || chars > '9') && chars != '.')
+                if ((chars < '0' || chars > '9') && chars.ToString() != System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
                 {
                     symbols.RemoveAt(index);
                     index--;
@@ -92,7 +93,7 @@ namespace WpfFunctionSeries
             for (var index = 0; index < symbols.Count; index++)
             {
                 var chars = symbols[index];
-                if (chars == '.')
+                if (chars.ToString() == System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
                 {
                     dot_counter++;
                     if (dot_counter >= 2)
@@ -103,8 +104,8 @@ namespace WpfFunctionSeries
                 }
             }
             string corr = new(symbols.ToArray());
-            if (corr.Length == 0) corr = "3.14";
-            if (corr == "0") corr = "3.14";
+            if (corr.Length == 0) corr = $"3{System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator}14";
+            if (corr == "0") corr = $"3{System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator}14";
             Tx_Per_Input.Text = corr;
         }
 

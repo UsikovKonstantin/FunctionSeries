@@ -36,7 +36,6 @@ namespace WpfFunctionSeries
                 Tx_Terms_Input.Text = prev_scroll_value.ToString();
                 General_Calc(sender, e);
             }
-            
         }
         
         private void General_Calc(object sender, RoutedEventArgs e)

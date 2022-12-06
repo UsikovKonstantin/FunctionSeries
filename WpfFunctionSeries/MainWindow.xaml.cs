@@ -52,6 +52,8 @@ namespace WpfFunctionSeries
             FourierSeries fs = new(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text), Tx_Fun_Input.Text,
                 type);
             W_Plot.Plot.Clear();
+            string pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
+            W_Plot.Plot.AddFunction((x) => call_fun(x, pol));
             W_Plot.Plot.AddFunction(new Func<double, double?>((x) => fs.Compute(x)));
             double max_x = double.Parse(Tx_Per_Input.Text);
             double step = (max_x * 2) / 1000;
@@ -67,6 +69,23 @@ namespace WpfFunctionSeries
             double diff = Math.Abs(aver - max_y)*1.1;
             W_Plot.Plot.SetAxisLimits(-max_x*3,max_x*3,aver-diff,aver+diff);
             W_Plot.Refresh();
+        }
+
+        double call_fun(double x, string polish)
+        {
+            double period = Double.Parse(Tx_Per_Input.Text);
+            if (Rb_Asym.IsChecked.Value) x -= (Math.Round(x / period))*period;
+            if (Rb_Sin.IsChecked.Value)
+            {
+                x -= (Math.Round(x / period))*period;
+                if (x < 0) return -Interpreter.SolvePolishExpression(polish, new() { { 'x', -x } });
+            }
+            if (Rb_Cos.IsChecked.Value)
+            {
+                x -= (Math.Round(x / period))*period;
+                x = Math.Abs(x);
+            }
+            return Interpreter.SolvePolishExpression(polish, new() { { 'x', x } });
         }
 
         void checks_terms()

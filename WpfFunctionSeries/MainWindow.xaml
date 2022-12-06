@@ -33,8 +33,8 @@
             
             <GroupBox Grid.Row="1" Header="Тип разложения функции">
                 <StackPanel Orientation="Horizontal">
-                    <RadioButton Name="Rb_Cos" Content="По косинусам (функция симметрична относительно горизонтали)" Click="General_Calc"/>
-                    <RadioButton Name="Rb_Sin" Content="По синусам (функция симметрична относительно вертикали)" Click="General_Calc"/>
+                    <RadioButton Name="Rb_Cos" Content="По косинусам (функция симметрична относительно вертикали)" Click="General_Calc"/>
+                    <RadioButton Name="Rb_Sin" Content="По синусам (функция симметрична относительно вертикали и горизотали)" Click="General_Calc"/>
                     <RadioButton Name="Rb_Asym" Content="Функция аморфна (не обладает симметрией)" IsChecked="True" Click="General_Calc"/>
                 </StackPanel>
             </GroupBox>

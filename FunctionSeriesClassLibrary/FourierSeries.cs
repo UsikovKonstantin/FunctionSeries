@@ -80,9 +80,9 @@ namespace FunctionSeriesClassLibrary
             else
             {
                 for (int i = 1; i <= n; i++)
-                    b[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", 0, period / 2, 1000);
+                    b[i] = 2 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", -period / 2, period / 2, 1000);
                 for (int i = 0; i <= n; i++)
-                    a[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", 0, period / 2, 1000);
+                    a[i] = 2 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", -period / 2, period / 2, 1000);
             }
         }
 

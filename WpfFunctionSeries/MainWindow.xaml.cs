@@ -53,6 +53,19 @@ namespace WpfFunctionSeries
                 type);
             W_Plot.Plot.Clear();
             W_Plot.Plot.AddFunction(new Func<double, double?>((x) => fs.Compute(x)));
+            double max_x = double.Parse(Tx_Per_Input.Text);
+            double step = (max_x * 2) / 1000;
+            double min_y = double.MaxValue,max_y = double.MinValue;
+            for (double i = -max_x; i <= max_x; i+= step)
+            {
+                double val = fs.Compute(i);
+                min_y = Math.Min(val, min_y);
+                max_y = Math.Max(val, max_y);
+            }
+
+            double aver = (max_y + min_y) / 2;
+            double diff = Math.Abs(aver - max_y)*1.1;
+            W_Plot.Plot.SetAxisLimits(-max_x*3,max_x*3,aver-diff,aver+diff);
             W_Plot.Refresh();
         }
 

@@ -73,16 +73,16 @@ namespace FunctionSeriesClassLibrary
 
             if (type == FourierSeriesType.Sin)
                 for (int i = 1; i <= n; i++)
-                    b[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", 0, period / 2, 1000);
+                    b[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", 0, period / 2, 100);
             else if (type == FourierSeriesType.Cos)
                 for (int i = 0; i <= n; i++)
-                    a[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", 0, period / 2, 1000);
+                    a[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", 0, period / 2, 100);
             else
             {
                 for (int i = 1; i <= n; i++)
-                    b[i] = 2 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", -period / 2, period / 2, 1000);
+                    b[i] = 2 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", -period / 2, period / 2, 100);
                 for (int i = 0; i <= n; i++)
-                    a[i] = 2 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", -period / 2, period / 2, 1000);
+                    a[i] = 2 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", -period / 2, period / 2, 100);
             }
         }
 
@@ -182,17 +182,15 @@ namespace FunctionSeriesClassLibrary
         /// <returns> значение интеграла </returns>
         public double Integral(string polFunc, double a, double b, int steps)
         {
-            double i = a; 
             double step = (b - a) / steps;  // ширина шага
             double res = 0;
             double prev = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', a } });
             double next;
-            while (i < b)
+            for (int i = 1; i <= steps; i++)
             {
-                next = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', i + step } });
+                next = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', a + step * i } });
                 res += 0.5 * step * (prev + next);
                 prev = next;
-                i += step;
             }
             return res;
         }

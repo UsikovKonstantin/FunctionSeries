@@ -182,6 +182,7 @@ namespace WpfFunctionSeries
         private void Bt_Text_OnClick(object sender, RoutedEventArgs e)
         {
             if (!IsInitialized) return;
+            if (!checks_Fun()) return;
             if (Rb_Sin.IsChecked.Value) new Text_repr(int.Parse(Tx_Terms_Input.Text),Double.Parse(Tx_Per_Input.Text),Tx_Fun_Input.Text,FourierSeriesType.Sin).Show();
             if (Rb_Cos.IsChecked.Value) new Text_repr(int.Parse(Tx_Terms_Input.Text),Double.Parse(Tx_Per_Input.Text),Tx_Fun_Input.Text,FourierSeriesType.Cos).Show();
             if (Rb_Asym.IsChecked.Value) new Text_repr(int.Parse(Tx_Terms_Input.Text),Double.Parse(Tx_Per_Input.Text),Tx_Fun_Input.Text,FourierSeriesType.CosSin).Show();

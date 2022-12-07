@@ -70,6 +70,7 @@ namespace WpfFunctionSeries
 
             double aver = (max_y + min_y) / 2;
             double diff = Math.Abs(aver - max_y)*1.1;
+            if (diff < 0.000001) diff = 1;
             W_Plot.Plot.SetAxisLimits(-max_x*3,max_x*3,aver-diff,aver+diff);
             W_Plot.Refresh();
         }
@@ -77,7 +78,6 @@ namespace WpfFunctionSeries
         double call_fun(double x, string polish)
         {
             double period = Double.Parse(Tx_Per_Input.Text);
-            if (double.TryParse(polish,out double att)) return att;
             if (Rb_Asym.IsChecked.Value) x -= (Math.Round(x / period))*period;
             if (Rb_Sin.IsChecked.Value)
             {

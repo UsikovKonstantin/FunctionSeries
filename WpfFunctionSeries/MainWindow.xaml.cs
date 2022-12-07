@@ -61,8 +61,11 @@ namespace WpfFunctionSeries
             for (double i = -max_x; i <= max_x; i+= step)
             {
                 double val = fs.Compute(i);
+                double val2 = call_fun(i, pol);
                 min_y = Math.Min(val, min_y);
                 max_y = Math.Max(val, max_y);
+                min_y = Math.Min(val2, min_y);
+                max_y = Math.Max(val2, max_y);
             }
 
             double aver = (max_y + min_y) / 2;

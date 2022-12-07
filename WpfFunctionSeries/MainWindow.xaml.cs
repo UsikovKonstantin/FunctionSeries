@@ -31,6 +31,7 @@ namespace WpfFunctionSeries
         private void Scr_Pow_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (!IsInitialized) return;
+            // Вычисления только в случае достаточного отличия от текущего значения
             if (Math.Abs(Math.Round(Scr_Pow.Value) - prev_scroll_value) > 0.9)
             {
                 prev_scroll_value = (int)Math.Round(Scr_Pow.Value);
@@ -51,14 +52,20 @@ namespace WpfFunctionSeries
             else type = FourierSeriesType.CosSin;
             FourierSeries fs = new(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text), Tx_Fun_Input.Text,
                 type);
+            Update_Plot(fs);
+        }
+
+        private void Update_Plot(FourierSeries fs)
+        { // Работа с графиком
             W_Plot.Plot.Clear();
             string pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
             W_Plot.Plot.AddFunction((x) => call_fun(x, pol));
-            W_Plot.Plot.AddFunction(new Func<double, double?>((x) => fs.Compute(x)));
+            W_Plot.Plot.AddFunction((x) => fs.Compute(x));
+            // постановка более удобных границ графика
             double max_x = double.Parse(Tx_Per_Input.Text);
             double step = (max_x * 2) / 1000;
-            double min_y = double.MaxValue,max_y = double.MinValue;
-            for (double i = -max_x; i <= max_x; i+= step)
+            double min_y = double.MaxValue, max_y = double.MinValue;
+            for (double i = -max_x; i <= max_x; i += step)
             {
                 double val = fs.Compute(i);
                 double val2 = call_fun(i, pol);
@@ -69,14 +76,14 @@ namespace WpfFunctionSeries
             }
 
             double aver = (max_y + min_y) / 2;
-            double diff = Math.Abs(aver - max_y)*1.1;
+            double diff = Math.Abs(aver - max_y) * 1.1;
             if (diff < 0.000001) diff = 1;
-            W_Plot.Plot.SetAxisLimits(-max_x*3,max_x*3,aver-diff,aver+diff);
+            W_Plot.Plot.SetAxisLimits(-max_x * 3, max_x * 3, aver - diff, aver + diff);
             W_Plot.Refresh();
         }
 
         double call_fun(double x, string polish)
-        {
+        {// Вызывает функцию таким образом, как если бы она была периодической
             double period = Double.Parse(Tx_Per_Input.Text);
             if (Rb_Asym.IsChecked.Value) x -= (Math.Round(x / period))*period;
             if (Rb_Sin.IsChecked.Value)
@@ -93,8 +100,9 @@ namespace WpfFunctionSeries
         }
 
         void checks_terms()
-        {
+        {// Проверка количества коэфициентов
             List<char> symbols = new(Tx_Terms_Input.Text);
+            // Удаление недопустимых символов
             for (var index = 0; index < symbols.Count; index++)
             {
                 var chars = symbols[index];
@@ -104,17 +112,19 @@ namespace WpfFunctionSeries
                     index--;
                 }
             }
-
+            //Замена текущей строки на корректную
             string corr = new(symbols.ToArray());
             if (corr.Length == 0) corr = "5";
             if (corr == "0") corr = "1";
             Tx_Terms_Input.Text = corr;
+            // перевод слайдера на новое значение
             if (int.Parse(corr) < 101) Scr_Pow.Value = int.Parse(corr);
         }
 
         void checks_period()
-        {
+        {// Проверка периода функции
             List<char> symbols = new(Tx_Per_Input.Text);
+            // Удаление недопустимых символов
             for (var index = 0; index < symbols.Count; index++)
             {
                 var chars = symbols[index];
@@ -124,7 +134,7 @@ namespace WpfFunctionSeries
                     index--;
                 }
             }
-
+            // Максимум одна точка
             int dot_counter = 0;
             for (var index = 0; index < symbols.Count; index++)
             {
@@ -139,6 +149,7 @@ namespace WpfFunctionSeries
                     }
                 }
             }
+            //Замена текущей строки на корректную
             string corr = new(symbols.ToArray());
             if (corr.Length == 0) corr = $"3{System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator}14";
             if (corr == "0") corr = $"3{System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator}14";
@@ -146,7 +157,7 @@ namespace WpfFunctionSeries
         }
 
         bool checks_Fun()
-        {
+        {// Проверка функции
             try
             {
                 Dictionary<char, double> t = new();
@@ -164,23 +175,23 @@ namespace WpfFunctionSeries
                 return false;
             }
         }
-
+        // Конвертация в формат понимаемый интерпретатором
         string convert_to_interpret(string function) => function.Replace("sqrt", "√");
         
         private void Bt_Help_OnClick(object sender, RoutedEventArgs e)
-        {
+        {// Вызов окна со справкой
             if (!IsInitialized) return;
             new Help().Show();
         }
 
         private void Bt_Approx_OnClick(object sender, RoutedEventArgs e)
-        {
+        {// Вызов окна аппроксимации
             if (!IsInitialized) return;
             new Approx().Show();
         }
 
-        private void Bt_Text_OnClick(object sender, RoutedEventArgs e)
-        {
+        private void Bt_Text_OnClick(object sender, RoutedEventArgs e) 
+        {// Вызов окна с функцией и соотвествующим ей рядом
             if (!IsInitialized) return;
             if (!checks_Fun()) return;
             if (Rb_Sin.IsChecked.Value) new Text_repr(int.Parse(Tx_Terms_Input.Text),Double.Parse(Tx_Per_Input.Text),Tx_Fun_Input.Text,FourierSeriesType.Sin).Show();

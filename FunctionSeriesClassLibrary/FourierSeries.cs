@@ -72,18 +72,21 @@ namespace FunctionSeriesClassLibrary
             polFunc = Interpreter.GetPolishExpression(function);
 
             if (type == FourierSeriesType.Sin)
-                for (int i = 1; i <= n; i++)
+                Parallel.For(1, n + 1, i =>
+                {
                     b[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", 0, period / 2, 100);
+                });
             else if (type == FourierSeriesType.Cos)
-                for (int i = 0; i <= n; i++)
+                Parallel.For(0, n + 1, i =>
+                {
                     a[i] = 4 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", 0, period / 2, 100);
+                });
             else
-            {
-                for (int i = 1; i <= n; i++)
-                    b[i] = 2 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", -period / 2, period / 2, 200);
-                for (int i = 0; i <= n; i++)
+                Parallel.For(0, n + 1, i =>
+                {
                     a[i] = 2 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * cos *", -period / 2, period / 2, 200);
-            }
+                    b[i] = 2 / period * Integral(polFunc + (i * Math.PI / period * 2) + " x * sin *", -period / 2, period / 2, 200);
+                });
         }
 
         /// <summary>
@@ -94,10 +97,11 @@ namespace FunctionSeriesClassLibrary
         public double Compute(double x)
         { 
             double res = a[0] / 2;
+            double c = Math.PI / period * 2 * x;
             for (int i = 1; i <= n; i++)
             {
-                res += a[i] * Math.Cos(i * Math.PI / period * 2 * x);
-                res += b[i] * Math.Sin(i * Math.PI / period * 2 * x);
+                double cc = i * c;
+                res += a[i] * Math.Cos(cc) + b[i] * Math.Sin(cc);
             }
             return res;
         }
@@ -184,14 +188,14 @@ namespace FunctionSeriesClassLibrary
         {
             double step = (b - a) / steps;  // ширина шага
             double res = 0;
-            double prev = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', a } });
-            double next;
-            for (int i = 1; i <= steps; i++)
+            double[] values = new double[steps + 1];
+            Parallel.For(0, steps + 1, i =>
             {
-                next = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', a + step * i } });
-                res += 0.5 * step * (prev + next);
-                prev = next;
-            }
+                values[i] = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', a + step * i } });
+            });
+            for (int i = 0; i < steps; i++)
+                res += values[i] + values[i + 1];
+            res *= 0.5 * step;
             return res;
         }
     }

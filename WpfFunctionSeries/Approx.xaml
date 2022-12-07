@@ -19,7 +19,7 @@
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="Tx_Terms_Input" Grid.Column="0" Text="5" TextChanged="Tx_Terms_Input_OnTextChanged"/>
-                <ScrollBar Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5" Name="Scr_Pow" ValueChanged="Scr_Pow_OnValueChanged"/>
+                <Slider Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5" Name="Scr_Pow" ValueChanged="Scr_Pow_OnValueChanged"/>
             </Grid>
         </GroupBox>
         <WpfPlot Grid.Row="1" Name="W_Plot" KeyDown="W_Plot_OnKeyDown" MouseEnter="W_Plot_OnMouseEnter"/>

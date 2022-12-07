@@ -46,7 +46,7 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="Tx_Terms_Input" Grid.Column="0" Text="5" TextChanged="General_Calc"/>
-                    <ScrollBar Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5" Name="Scr_Pow" ValueChanged="Scr_Pow_OnValueChanged"/>
+                    <Slider Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5" Name="Scr_Pow" ValueChanged="Scr_Pow_OnValueChanged"/>
                 </Grid>
             </GroupBox>
         </Grid>

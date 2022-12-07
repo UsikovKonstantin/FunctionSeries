@@ -77,6 +77,7 @@ namespace WpfFunctionSeries
         double call_fun(double x, string polish)
         {
             double period = Double.Parse(Tx_Per_Input.Text);
+            if (double.TryParse(polish,out double att)) return att;
             if (Rb_Asym.IsChecked.Value) x -= (Math.Round(x / period))*period;
             if (Rb_Sin.IsChecked.Value)
             {

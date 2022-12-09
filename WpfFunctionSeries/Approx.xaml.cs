@@ -115,6 +115,9 @@ public partial class Approx : Window
         }
 
         W_Plot.Plot.SetAxisLimits(cur_lim);
+        int precision = Math.Min(point_cloud.Count, int.Parse(Tx_Terms_Input.Text));
+        FourierSeries fs = new(point_cloud, precision);
+        W_Plot.Plot.AddFunction((x) => fs.Compute(x));
         W_Plot.Refresh();
     }
 }

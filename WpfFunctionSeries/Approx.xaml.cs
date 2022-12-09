@@ -37,7 +37,8 @@ public partial class Approx : Window
     private void Bt_Text_OnClick(object sender, RoutedEventArgs e)
     {
         if (!IsInitialized) return;
-        new Text_repr(int.Parse(Tx_Terms_Input.Text), 3.14, "x", FourierSeriesType.CosSin).Show();
+        if (point_cloud.Count == 0) return; 
+        new Text_repr(Text_repr.Text_type.approx,fa:new(point_cloud)).Show();
     }
 
     private void Tx_Terms_Input_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -73,18 +74,16 @@ public partial class Approx : Window
     private void W_Plot_OnKeyDown(object sender, KeyEventArgs e)
     {
         if (!IsInitialized) return;
-        while (e.IsDown && e.Key != Key.D)
+        if (e.Key == Key.S)
         {
-            if (e.Key == Key.S)
-            {
-                var point = W_Plot.GetMouseCoordinates();
-                foreach (var points in point_cloud)
-                    if (points.x == point.x && points.y == point.y)
-                        return;
-                point_cloud.Add(point);
-                Calculate();
-            }
+            var point = W_Plot.GetMouseCoordinates();
+            foreach (var points in point_cloud)
+                if (points.x == point.x && points.y == point.y)
+                    return;
+            point_cloud.Add(point);
+            Calculate();
         }
+
         if (e.Key == Key.D && point_cloud.Count > 0)
         {
             var coord = W_Plot.GetMouseCoordinates();
@@ -100,6 +99,7 @@ public partial class Approx : Window
                     min = i;
                 }
             }
+
             point_cloud.RemoveAt(min);
             Calculate();
         }
@@ -113,11 +113,13 @@ public partial class Approx : Window
         {
             W_Plot.Plot.AddPoint(point.x, point.y, Color.Blue);
         }
-
         W_Plot.Plot.SetAxisLimits(cur_lim);
-        int precision = Math.Min(point_cloud.Count, int.Parse(Tx_Terms_Input.Text));
-        FourierApprox fs = new(point_cloud, precision);
-        W_Plot.Plot.AddFunction((x) => fs.Compute(x),Color.Orange);
+        if (point_cloud.Count != 0)
+        {
+            int precision = Math.Min(point_cloud.Count, int.Parse(Tx_Terms_Input.Text));
+            FourierApprox fs = new(point_cloud);
+            W_Plot.Plot.AddFunction((x) => fs.Compute(x, precision), Color.Orange);
+        }
         W_Plot.Refresh();
     }
 }

@@ -202,58 +202,6 @@ namespace FunctionSeriesClassLibrary
             res *= 0.5 * step;
             return res;
         }
-
-        #region NUDFT
-        /// <summary>
-        /// Получение ряда Фурье посредством поля точек (Тип 2)
-        /// </summary>
-        /// <param name="point_cloud">Поле точек</param>
-        /// <param name="precision">Количество коэффициентов</param>
-        public FourierSeries(List<(double x, double y)> point_cloud, int precision)
-        {
-            n = precision;
-            l = Get_Period(point_cloud);
-            type = FourierSeriesType.CosSin;
-            a = new double[n + 1];
-            b = new double[n + 1];
-            NDFT_Coefficients(point_cloud, precision);
-        }
-
-        double Get_Period(List<(double x, double y)> point_cloud)
-        {
-            double min_x = Double.MaxValue, max_x = Double.MinValue;
-            
-            foreach (var point in point_cloud)
-            {
-                min_x = Math.Min(min_x, point.x);
-                max_x = Math.Max(max_x, point.x);
-            }
-
-            return (max_x - min_x) / 2;
-        }
-
-        void NDFT_Coefficients(List<(double x, double y)> point_cloud, int precision)
-        {
-            double Delta_K = Math.PI / l;
-            for (int i = 0; i < precision; i++)
-            {
-                Complex Coef = Get_Specific(Delta_K, point_cloud, i + 1);
-                a[i] = Math.Cos(Coef.Phase);
-                b[i] = Math.Sin(Coef.Phase);
-            }
-        }
-
-        Complex Get_Specific(double Delta_K, List<(double x, double y)> point_cloud, int frequency)
-        {
-            Complex Coef = new (0, 0);
-            
-            foreach (var point in point_cloud)
-            {
-                Coef += point.y * Complex.Pow(new(Math.E, 0),Complex.ImaginaryOne * Delta_K * frequency * point.x);
-            }
-            
-            return Coef;
-        }
-        #endregion
+        
     }
 }

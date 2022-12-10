@@ -12,11 +12,13 @@ public class FourierApprox
     private List<Complex> Frequencies = new(); // Частоты
     private int num_points = 0; // Количество точек в аппроксимации
     private double period = 0.0; // Период ряда 
-    private int Frequncy_Count = 0;
+    private int Frequncy_Count = 0; // Количество частот
+    
     /// <summary>
     /// Получение ряда Фурье посредством поля точек (Тип 2)
     /// </summary>
     /// <param name="point_cloud">Поле точек</param>
+    /// /// <param name="precision">Сколько нужно частот</param>
     public FourierApprox(List<(double x, double y)> point_cloud, int precision)
     {
         num_points = point_cloud.Count;
@@ -25,12 +27,18 @@ public class FourierApprox
         period = Get_Period();
         NDFT_Coefficients();
     }
-
+    /// <summary>
+    /// Период ряда по полю точек
+    /// </summary>
+    /// <returns>Период ряда</returns>
     private double Get_Period()
     {
         return Point_cloud.Max((point) => point.x) - Point_cloud.Min((point) => point.x);
     }
 
+    /// <summary>
+    /// Получение коэффициентов ряда Фурье
+    /// </summary>
     void NDFT_Coefficients()
     {
         Complex Dk = -Complex.ImaginaryOne * (2 * Math.PI / period);
@@ -40,6 +48,12 @@ public class FourierApprox
         }
     }
 
+    /// <summary>
+    /// Получение специфической частоты в ряде
+    /// </summary>
+    /// <param name="i">Порядковый номер частоты</param>
+    /// <param name="dk">Константа ряда</param>
+    /// <returns>Частота в комплексной форме</returns>
     private Complex Get_Specific(int i, Complex dk)
     {
         Complex Coef = new(0, 0);
@@ -50,8 +64,12 @@ public class FourierApprox
 
         return Coef;
     }
-
-
+    
+    /// <summary>
+    /// Вычисление значения в точке посредством инверсного преобразования
+    /// </summary>
+    /// <param name="x">Координата для вычисления</param>
+    /// <returns>Значение при координате</returns>
     public double Compute(double x)
     {
         Complex result = 0;
@@ -67,10 +85,13 @@ public class FourierApprox
         return result.Real;
     }
 
+    /// <summary>
+    /// Строковое представление ряда
+    /// </summary>
+    /// <returns>Строка</returns>
     public override string ToString()
     {
         StringBuilder builder = new();
-        builder.Append("Частоты:");
         foreach (var frequency in Frequencies)
         {
             builder.Append($"{frequency}, ");

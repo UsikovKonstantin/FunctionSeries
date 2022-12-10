@@ -17,10 +17,10 @@ public partial class Text_repr : Window
         switch (type)
         {
             case Text_type.function:
-                Block.Text = fs.ToString();
+                Block.Text = $"{fs}";
                 break;
             case Text_type.approx:
-                Block.Text = fa.ToString();
+                Block.Text = $"Частоты:{fa}";
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);

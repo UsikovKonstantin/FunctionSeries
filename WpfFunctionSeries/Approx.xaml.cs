@@ -116,7 +116,7 @@ public partial class Approx : Window
         W_Plot.Plot.SetAxisLimits(cur_lim);
         if (point_cloud.Count != 0)
         {
-            int precision = Math.Min(point_cloud.Count, int.Parse(Tx_Terms_Input.Text));
+            int precision =int.Parse(Tx_Terms_Input.Text);
             FourierApprox fs = new(point_cloud, precision);
             W_Plot.Plot.AddFunction((x) => fs.Compute(x), Color.Orange);
         }

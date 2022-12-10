@@ -42,7 +42,7 @@ public class FourierApprox
     void NDFT_Coefficients()
     {
         Complex Dk = -Complex.ImaginaryOne * (2 * Math.PI / period);
-        for (int i = 1; i <= Frequncy_Count; i++)
+        for (int i = -Frequncy_Count; i <= Frequncy_Count; i++)
         {
             Frequencies.Add(Get_Specific(i,Dk));
         }
@@ -73,12 +73,11 @@ public class FourierApprox
     public double Compute(double x)
     {
         Complex result = 0;
-        double Dfreq = 2 * Math.PI / period;
         Complex Dk = Complex.ImaginaryOne * (2 * Math.PI / period);
-        double frequency = 0;
-        for (int i = 1; i <= Frequncy_Count; i++,frequency+=Dfreq)
+        int counter = 0;
+        for (int i = -Frequncy_Count; i <= Frequncy_Count; i++, counter++)
         {
-            result += Frequencies[i-1] * Complex.Pow(new(Math.E, 0), Dk * i * x);
+            result += Frequencies[counter] * Complex.Pow(new(Math.E, 0), Dk * i * x);
         }
 
         result /= num_points;

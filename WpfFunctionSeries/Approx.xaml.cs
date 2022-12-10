@@ -38,7 +38,7 @@ public partial class Approx : Window
     {
         if (!IsInitialized) return;
         if (point_cloud.Count == 0) return; 
-        new Text_repr(Text_repr.Text_type.approx,fa:new(point_cloud)).Show();
+        new Text_repr(Text_repr.Text_type.approx,fa:new(point_cloud, int.Parse(Tx_Terms_Input.Text))).Show();
     }
 
     private void Tx_Terms_Input_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -117,8 +117,8 @@ public partial class Approx : Window
         if (point_cloud.Count != 0)
         {
             int precision = Math.Min(point_cloud.Count, int.Parse(Tx_Terms_Input.Text));
-            FourierApprox fs = new(point_cloud);
-            W_Plot.Plot.AddFunction((x) => fs.Compute(x, precision), Color.Orange);
+            FourierApprox fs = new(point_cloud, precision);
+            W_Plot.Plot.AddFunction((x) => fs.Compute(x), Color.Orange);
         }
         W_Plot.Refresh();
     }

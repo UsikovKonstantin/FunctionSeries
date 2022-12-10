@@ -14,4 +14,4 @@ string test = "3";
 bool test2 = Interpreter.IsVarInPolExpression(test);
 Console.WriteLine(test2);
 
-Console.WriteLine(new FourierApprox(new List<(double x, double y)>() {(1,1),(2,2)}).Compute(1.5, 1));
+Console.WriteLine(new FourierApprox(new List<(double x, double y)>() {(1,1),(2,2)},2).Compute(1.5));

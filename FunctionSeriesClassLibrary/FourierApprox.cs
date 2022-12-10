@@ -8,60 +8,72 @@ namespace FunctionSeriesClassLibrary;
 /// </summary>
 public class FourierApprox
 {
-    private List<(Complex Coef, int freq)> Frequencies = new(); // Частоты
+    private List<(double x, double y)> Point_cloud; //Поле точек для аппроксимации
+    private List<Complex> Frequencies = new(); // Частоты
     private int num_points = 0; // Количество точек в аппроксимации
+    private double period = 0.0; // Период ряда 
+    private int Frequncy_Count = 0;
     /// <summary>
     /// Получение ряда Фурье посредством поля точек (Тип 2)
     /// </summary>
     /// <param name="point_cloud">Поле точек</param>
-    public FourierApprox(List<(double x, double y)> point_cloud)
+    public FourierApprox(List<(double x, double y)> point_cloud, int precision)
     {
         num_points = point_cloud.Count;
-        NDFT_Coefficients(point_cloud);
+        Point_cloud = point_cloud;
+        Frequncy_Count = precision;
+        period = Get_Period();
+        NDFT_Coefficients();
     }
 
-    void NDFT_Coefficients(List<(double x, double y)> point_cloud)
+    private double Get_Period()
     {
-        for (int i = 0; i < num_points; i++)
-        {
-            Complex Coef = Get_Specific(point_cloud, i);
-            Frequencies.Add((Coef,i));
-        }
-
-        Frequencies.Sort((x, y) => -x.Coef.Magnitude.CompareTo(y.Coef.Magnitude));
+        return Point_cloud.Max((point) => point.x) - Point_cloud.Min((point) => point.x);
     }
 
-    Complex Get_Specific(List<(double x, double y)> point_cloud, int frequency)
+    void NDFT_Coefficients()
     {
-        Complex Coef = new Complex(0, 0);
-        Complex modex_constant = 2 * Math.PI * Complex.ImaginaryOne * frequency;
-        foreach (var point in point_cloud)
+        Complex Dk = -Complex.ImaginaryOne * (2 * Math.PI / period);
+        for (int i = 1; i <= Frequncy_Count; i++)
         {
-            Coef += point.y * Complex.Pow(new (Math.E, 0), modex_constant * point.x);
+            Frequencies.Add(Get_Specific(i,Dk));
         }
-        
+    }
+
+    private Complex Get_Specific(int i, Complex dk)
+    {
+        Complex Coef = new(0, 0);
+        foreach (var Point in Point_cloud)
+        {
+            Coef += Point.y * Complex.Pow(new(Math.E, 0), dk * i * Point.x);
+        }
+
         return Coef;
     }
-    
-    public double Compute(double x, int precision)
+
+
+    public double Compute(double x)
     {
-        Complex result = new (0, 0);
-        Complex modex_constant = 2 * Math.PI * Complex.ImaginaryOne;
-        for (int i = 0; i < precision; i++)
+        Complex result = 0;
+        double Dfreq = 2 * Math.PI / period;
+        Complex Dk = Complex.ImaginaryOne * (2 * Math.PI / period);
+        double frequency = 0;
+        for (int i = 1; i <= Frequncy_Count; i++,frequency+=Dfreq)
         {
-            result += Frequencies[i].Coef.Magnitude * Complex.Pow(new (Math.E, 0), modex_constant * x * Frequencies[i].freq);
+            result += Frequencies[i-1] * Complex.Pow(new(Math.E, 0), Dk * i * x);
         }
-        
-        double res = result.Phase;
-        return res;
+
+        result /= num_points;
+        return result.Real;
     }
 
     public override string ToString()
     {
         StringBuilder builder = new();
+        builder.Append("Частоты:");
         foreach (var frequency in Frequencies)
         {
-            builder.Append($"{frequency.freq}:{frequency.Coef}, ");
+            builder.Append($"{frequency}, ");
         }
         return builder.ToString();
     }

@@ -3,7 +3,12 @@ using System.Collections.Generic;
 
 namespace FunctionSeriesClassLibrary {
     public static class Interpreter {
-        // Метод возвращает обратную польскую запись
+        /// <summary>
+        /// Метод возвращает обратную польскую запись
+        /// </summary>
+        /// <param name="input">функция</param>
+        /// <returns>польская запись</returns>
+        /// <exception cref="Exception">если выражение введено не верно</exception>
         public static string GetPolishExpression(string input) {
             input = input.Trim();
             string output = "";
@@ -89,6 +94,12 @@ namespace FunctionSeriesClassLibrary {
             return output;
         }
 
+        /// <summary>
+        /// Метод решает польскую запись
+        /// </summary>
+        /// <param name="s">польская запись</param>
+        /// <param name="variables">переменные, которые есть в польской записи</param>
+        /// <returns>Ответ в виде численного значения</returns>
         public static double SolvePolishExpression(string s, Dictionary<char, double> variables) {
             Stack<double> values = new Stack<double>();
             string[] polishNotation = ConvertVarsToNums(s.Trim().Split(' '), variables);
@@ -109,7 +120,11 @@ namespace FunctionSeriesClassLibrary {
             return values.Pop();
         }
 
-        // Есть ли переменные в выражении
+        /// <summary>
+        /// Есть ли переменные в выражении
+        /// </summary>
+        /// <param name="s">функция</param>
+        /// <returns> В записи есть переменные - True, иначе - False</returns>
         public static bool IsVarInPolExpression(string s) {
             string[] polishNotation = GetPolishExpression(s).Trim().Split(' ');
 
@@ -124,75 +139,34 @@ namespace FunctionSeriesClassLibrary {
             return false;
         }
 
-        public static string GetLexems(string s) {
-            string res = "";
-            for (int i = 0; i < s.Length; i++) {
-                if (IsDelimeter(s[i])) continue;
-
-                string type = "";
-                string value = "";
-                string priority = "";
-                if (IsOperator(s[i])) {
-                    if (s[i] == '(') type = "left_bracket";
-                    else if (s[i] == ')') type = "right_bracket";
-                    else type = "operation_sign";
-
-                    value = s[i].ToString();
-                    priority = GetPriority(value).ToString();
-                } else if (IsFunction(i, s)) {
-                    type = "function";
-
-                    HashSet<string> possibleFuncs = new HashSet<string>() { "sin", "cos", "tan", "ctan", "arcsin", "arccos", "arctan", "arcctan", "log", "ln", "sqrt", "√", "-sin", "-cos", "-tan", "-ctan", "-arcsin", "-arccos", "-arctan", "-arcctan", "-log", "-ln", "-sqrt", "-√" };
-                    value = "";
-                    // Читаем до разделителя или оператора, чтобы получить число
-                    while (!IsDelimeter(s[i]) && !IsOperator(s[i])) {
-                        value += s[i];
-                        i++;
-
-                        if (possibleFuncs.Contains(value)) break;
-                        // Если символ - последний, то выходим из цикла
-                        if (i == s.Length) break;
-                    }
-                    if (!possibleFuncs.Contains(value)) throw new Exception("Выражение введено не верно");
-
-                    priority = GetPriority(value).ToString();
-                    i--;
-                } else if (char.IsDigit(s[i]) || char.IsLetter(s[i])) {
-                    if (char.IsDigit(s[i]) || s[i] == 'e' || s[i] == 'π') type = "number";
-                    else if (char.IsLetter(s[i])) type = "indetificator";
-
-                    value = "";
-                    // Читаем до разделителя или оператора, чтобы получить число
-                    while (!IsDelimeter(s[i]) && !IsOperator(s[i])) {
-                        value += s[i];
-                        i++;
-
-                        // Если символ - последний, то выходим из цикла
-                        if (i == s.Length) break;
-                    }
-
-                    i--;
-                }
-                res += $"type={type}; value={value}; {(priority != "" ? "priority=" + priority : "")}\n";
-            }
-            return res;
-        }
-
-        // Метод возвращает true, если проверяемый символ - пробел
+        /// <summary>
+        /// Метод проверяет есле символ - пробел
+        /// </summary>
+        /// <param name="c">проверяемый символ</param>
+        /// <returns>Проверяемый символ пробел - True, иначе - False</returns>
         private static bool IsDelimeter(char c) {
             if ((" ".IndexOf(c) != -1))
                 return true;
             return false;
         }
 
-        // Метод возвращает true, если проверяемый символ - оператор
+        /// <summary>
+        /// Метод проверяет есле символ - оператор
+        /// </summary>
+        /// <param name="с">проверяемый символ</param>
+        /// <returns>Проверяемый символ оператор - True, иначе - False</returns>
         private static bool IsOperator(char с) {
             if (("+-/÷:*×^()!".IndexOf(с) != -1))
                 return true;
             return false;
         }
 
-        // Метод возвращает true, если проверяемый символ - функция
+        /// <summary>
+        /// Метод проверяет если проверяемая подстрока - функция
+        /// </summary>
+        /// <param name="idx">начало проверяемой подстроки в исходной строке</param>
+        /// <param name="s">строка с функцией</param>
+        /// <returns>Проверяемая подстрока функция - True, иначе - False</returns>
         private static bool IsFunction(int idx, string s) {
             bool isFunction = idx <= s.Length - 2 && char.IsLetter(s[idx]) && char.IsLetter(s[idx + 1]);
             bool isFunctionWithMinus = idx <= s.Length - 3 && s[idx] == '-' && char.IsLetter(s[idx + 1]) && char.IsLetter(s[idx + 2]);
@@ -202,7 +176,11 @@ namespace FunctionSeriesClassLibrary {
             return false;
         }
 
-        // Метод возвращает приоритет оператора
+        /// <summary>
+        /// Метод возвращает приоритет оператора/функции
+        /// </summary>
+        /// <param name="s">опреатор/функция</param>
+        /// <returns>Приоритет в виде числа</returns>
         private static int GetPriority(string s) {
             if (s.Length > 1 || s == "√" || s == "!") return 6;
             switch (s) {
@@ -217,7 +195,13 @@ namespace FunctionSeriesClassLibrary {
             }
         }
 
-        // Выполнение операций
+        /// <summary>
+        /// Выполнение математических операций (операторы, фукнции)
+        /// </summary>
+        /// <param name="oper">оператор/функция</param>
+        /// <param name="values">Числовые значения с которыми надо работать</param>
+        /// <returns>Результат математической операции - число</returns>
+        /// <exception cref="Exception">Функция или оператор не существуют</exception>
         private static double ComputeOperation(string oper, Stack<double> values) {
             if (oper == "+") {
                 double firstVal = values.Pop();
@@ -299,7 +283,13 @@ namespace FunctionSeriesClassLibrary {
             }
         }
 
-        // Заменить переменные на числа
+        /// <summary>
+        /// Заменяет переменные на числа в польской записи
+        /// </summary>
+        /// <param name="polishNotation">польская запись</param>
+        /// <param name="variables">переменные</param>
+        /// <returns>польскую запись, только вместо переменных числа</returns>
+        /// <exception cref="ApplicationException">Если нужной переменной нету</exception>
         private static string[] ConvertVarsToNums(string[] polishNotation, Dictionary<char, double> variables) {
             for (int i = 0; i < polishNotation.Length; i++) {
                 // Если текущий элемент - переменная

@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MathNet.Symbolics" Version="0.24.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FunctionSeriesClassLibrary\FunctionSeriesClassLibrary.csproj" />
   </ItemGroup>
 

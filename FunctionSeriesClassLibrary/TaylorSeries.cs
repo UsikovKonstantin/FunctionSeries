@@ -94,7 +94,7 @@ namespace FunctionSeriesClassLibrary {
             for (int i = 1; i < N + 1; i++) {
                 res += "";
                 double coef = Coefs[i];
-                res += $"{(coef >= 0 ? "+" : "-")}{(Math.Abs(coef) == 1 ? "" : coef)}{x}{(i > 1 ? $"^{i}" : "")}";
+                res += $"{(coef >= 0 ? " + " : "-")}{(Math.Abs(coef) == 1 ? "" : $"{coef}*")}{x}{(i > 1 ? $"^{i}" : "")}";
             }
 
             return res;

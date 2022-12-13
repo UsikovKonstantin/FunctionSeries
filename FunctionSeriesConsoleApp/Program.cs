@@ -46,6 +46,6 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 
 //Console.WriteLine(TaylorSeries("x^2+2", 2));
 
-TaylorSeries test = new TaylorSeries("arctg(x)", 0, 5);
+TaylorSeries test = new TaylorSeries("cosh(x)", 0, 5);
 Console.WriteLine(test);
 Console.WriteLine(test.Compute(2));

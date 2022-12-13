@@ -42,7 +42,7 @@ namespace FunctionSeriesClassLibrary {
                     }
                     if (input[i] != ')' && input[i] != '!') isPrevElOper = true;
                 } else if (IsFunction(i, input)) {
-                    HashSet<string> possibleFuncs = new HashSet<string>() { "sin", "cos", "tg", "ctg", "arcsin", "arccos", "arctg", "arcctg", "log", "ln", "sqrt", "√", "sh", "ch", "-sin", "-cos", "-tg", "-ctg", "-arcsin", "-arccos", "-arctg", "-arcctg", "-log", "-ln", "-sqrt", "-√", "-sh", "-ch", };
+                    HashSet<string> possibleFuncs = new HashSet<string>() { "sin", "cos", "tan", "ctan", "arcsin", "arccos", "atan", "actan", "log", "ln", "sqrt", "√", "sinh", "cosh", "-sin", "-cos", "-tan", "-ctan", "-arcsin", "-arccos", "-atan", "-actan", "-log", "-ln", "-sqrt", "-√", "-sinh", "-cosh", };
                     string func = "";
                     if (holdMinus) {
                         func += "-";
@@ -142,7 +142,7 @@ namespace FunctionSeriesClassLibrary {
                 } else if (IsFunction(i, s)) {
                     type = "function";
 
-                    HashSet<string> possibleFuncs = new HashSet<string>() { "sin", "cos", "tg", "ctg", "arcsin", "arccos", "arctg", "arcctg", "log", "ln", "sqrt", "√", "sh", "ch", "-sin", "-cos", "-tg", "-ctg", "-arcsin", "-arccos", "-arctg", "-arcctg", "-log", "-ln", "-sqrt", "-√", "-sh", "-ch", };
+                    HashSet<string> possibleFuncs = new HashSet<string>() { "sin", "cos", "tan", "ctan", "arcsin", "arccos", "atan", "actan", "log", "ln", "sqrt", "√", "sinh", "cosh", "-sin", "-cos", "-tan", "-ctan", "-arcsin", "-arccos", "-atan", "-actan", "-log", "-ln", "-sqrt", "-√", "-sinh", "-cosh", };
                     value = "";
                     // Читаем до разделителя или оператора, чтобы получить число
                     while (!IsDelimeter(s[i]) && !IsOperator(s[i])) {
@@ -266,11 +266,11 @@ namespace FunctionSeriesClassLibrary {
                 double firstVal = values.Pop();
                 if (oper[0] == '-') return -Math.Cos(firstVal);
                 return Math.Cos(firstVal);
-            } else if (oper == "tg" || oper == "-tg") {
+            } else if (oper == "tan" || oper == "-tan") {
                 double firstVal = values.Pop();
                 if (oper[0] == '-') return -Math.Tan(firstVal);
                 return Math.Tan(firstVal);
-            } else if (oper == "ctg" || oper == "-ctg") {
+            } else if (oper == "ctan" || oper == "-ctan") {
                 double firstVal = values.Pop();
                 if (oper[0] == '-') return -1 / Math.Tan(firstVal);
                 return 1 / Math.Tan(firstVal);
@@ -282,11 +282,11 @@ namespace FunctionSeriesClassLibrary {
                 double firstVal = values.Pop();
                 if (oper[0] == '-') return -Math.Acos(firstVal);
                 return Math.Acos(firstVal);
-            } else if (oper == "arctg" || oper == "-arctg") {
+            } else if (oper == "atan" || oper == "-atan") {
                 double firstVal = values.Pop();
                 if (oper[0] == '-') return -Math.Atan(firstVal);
                 return Math.Atan(firstVal);
-            } else if (oper == "arcctg" || oper == "-arcctg") {
+            } else if (oper == "actan" || oper == "-actan") {
                 double firstVal = values.Pop();
                 if (oper[0] == '-') return -1 / Math.Atan(firstVal);
                 return 1 / Math.Atan(firstVal);
@@ -294,11 +294,11 @@ namespace FunctionSeriesClassLibrary {
                 double firstVal = values.Pop();
                 if (oper[0] == '-') return -Math.Sqrt(firstVal);
                 return Math.Sqrt(firstVal);
-            } else if (oper == "sh" || oper == "-sh") {
+            } else if (oper == "sinh" || oper == "-sinh") {
                 double firstVal = values.Pop();
                 if (oper[0] == '-') return -Math.Sinh(firstVal);
                 return Math.Sinh(firstVal);
-            } else if (oper == "ch" || oper == "-ch") {
+            } else if (oper == "cosh" || oper == "-cosh") {
                 double firstVal = values.Pop();
                 if (oper[0] == '-') return -Math.Cosh(firstVal);
                 return Math.Cosh(firstVal);

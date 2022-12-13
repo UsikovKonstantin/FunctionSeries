@@ -57,6 +57,9 @@ namespace FunctionSeriesClassLibrary {
                 Expr derivative = prevDerivative.Differentiate(x);
                 string pol = Interpreter.GetPolishExpression(derivative.ToString());
                 Coefs[i] = Interpreter.SolvePolishExpression(pol, new Dictionary<char, double>() { { 'x', X0 } });
+                int factorial = 1;
+                for (int j = 2; j <= i; j++) factorial *= j;
+                Coefs[i] /= factorial;
                 prevDerivative = derivative;
             }
         }
@@ -71,10 +74,7 @@ namespace FunctionSeriesClassLibrary {
 
             for (int i = 1; i < N + 1; i++) {
                 double coef = Coefs[i];
-                int factorial = 1;
-                for (int j = 2; j <= i; j++) factorial *= j;
-                coef /= factorial;
-                coef *= x - X0;
+                coef *= Math.Pow(x - X0, i);
                 res += coef;
             }
 
@@ -89,15 +89,12 @@ namespace FunctionSeriesClassLibrary {
             string res = Coefs[0].ToString();
 
             string x = "x";
-            if (X0 != 0) x = $"(x{(X0 > 0 ? "+" : "")}{X0})";
+            if (X0 != 0) x = $"(x{(X0 >= 0 ? "+" : "")}{X0})";
 
             for (int i = 1; i < N + 1; i++) {
                 res += "";
                 double coef = Coefs[i];
-                int factorial = 1;
-                for (int j = 2; j <= i + 1; j++) factorial *= j;
-                coef /= factorial;
-                res += $"{(coef > 0 ? "+" : "")}{coef}{x}";
+                res += $"{(coef >= 0 ? "+" : "")}{coef}{x}";
             }
 
             return res;

@@ -46,6 +46,6 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 
 //Console.WriteLine(TaylorSeries("x^2+2", 2));
 
-TaylorSeries test = new TaylorSeries("sin(x)", 0, 2);
+TaylorSeries test = new TaylorSeries("sin(x)", 0, 3);
 Console.WriteLine(test);
 Console.WriteLine(test.Compute(2));

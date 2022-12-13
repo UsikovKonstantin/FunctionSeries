@@ -87,14 +87,24 @@ namespace FunctionSeriesClassLibrary {
         /// <returns>строковый вид ряда Тейлора</returns>
         public override string ToString() {
             string res = Coefs[0].ToString();
+            bool hasFirst = true;
+            if (Coefs[0] == 0) {
+                res = "";
+                hasFirst = false;
+            }
 
             string x = "x";
             if (X0 != 0) x = $"(x{(X0 >= 0 ? "+" : "")}{X0})";
 
             for (int i = 1; i < N + 1; i++) {
-                res += "";
                 double coef = Coefs[i];
-                res += $"{(coef >= 0 ? " + " : "-")}{(Math.Abs(coef) == 1 ? "" : $"{coef}*")}{x}{(i > 1 ? $"^{i}" : "")}";
+                if (coef == 0) continue;
+                if (!hasFirst) {
+                    res += $"{(Math.Abs(coef) == 1 ? "" : $"{coef}*")}{x}{(i > 1 ? $"^{i}" : "")}";
+                    hasFirst = true;
+                    continue;
+                };
+                res += $"{(coef >= 0 ? " + " : " - ")}{(Math.Abs(coef) == 1 ? "" : $"{Math.Abs(coef)}*")}{x}{(i > 1 ? $"^{i}" : "")}";
             }
 
             return res;

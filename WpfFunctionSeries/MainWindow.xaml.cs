@@ -102,8 +102,9 @@ namespace WpfFunctionSeries
         void set_Fun_type()
         {
             string pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
-            if (solve_at(-1,pol) == solve_at(1,pol)) Rb_Cos.IsChecked = true;
-            else if (solve_at(1, pol) == -solve_at(-1, pol)) Rb_Sin.IsChecked = true;
+            double TOLERANCE = 0.000001;
+            if (Math.Abs(solve_at(-1,pol) - solve_at(1,pol)) < TOLERANCE) Rb_Cos.IsChecked = true;
+            else if (Math.Abs(solve_at(1, pol) - (-solve_at(-1, pol))) < TOLERANCE) Rb_Sin.IsChecked = true;
             else Rb_Asym.IsChecked = true;
         }
 

@@ -69,6 +69,13 @@ namespace WpfFunctionSeries
             if (!IsInitialized) return;
             Set_Up_UI();
             if (!checks_Fun()) return;
+            try
+            {
+                var tx = (TextBox)sender;
+                if (tx.Name == "Tx_Fun_Input")
+                    set_Fun_type();
+            }
+            catch (Exception exception){}
             if (Rb_Fourier.IsChecked.Value)
             {
                 checks_terms();
@@ -92,6 +99,18 @@ namespace WpfFunctionSeries
             
         }
 
+        void set_Fun_type()
+        {
+            string pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
+            if (solve_at(-1,pol) == solve_at(1,pol)) Rb_Cos.IsChecked = true;
+            else if (solve_at(1, pol) == -solve_at(-1, pol)) Rb_Sin.IsChecked = true;
+            else Rb_Asym.IsChecked = true;
+        }
+
+        double solve_at(double x, string polish)
+        {
+            return Interpreter.SolvePolishExpression(polish, new() {{'x',x}});
+        }
         void checks_terms_taylor()
         {
             // Проверка количества коэфициентов

@@ -12,6 +12,7 @@ public partial class Text_repr : Window
         approx,
         taylor
     }
+
     public Text_repr(Text_type type, FourierSeries fs = null, FourierApprox fa = null, TaylorSeries ts = null)
     {
         InitializeComponent();
@@ -29,6 +30,5 @@ public partial class Text_repr : Window
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
-        
     }
 }

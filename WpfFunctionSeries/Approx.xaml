@@ -3,29 +3,35 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:WpfFunctionSeries"
         mc:Ignorable="d"
         Title="Approx" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" Header="Степень разложения в ряд Фурье">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="Tx_Terms_Input" Grid.Column="0" Text="5" TextChanged="Tx_Terms_Input_OnTextChanged"/>
-                <Slider Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5" Name="Scr_Pow" ValueChanged="Scr_Pow_OnValueChanged"/>
+                <TextBox x:Name="Tx_Terms_Input" Grid.Column="0" Text="5" TextChanged="Tx_Terms_Input_OnTextChanged" />
+                <Slider Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5" Name="Scr_Pow"
+                        ValueChanged="Scr_Pow_OnValueChanged" />
             </Grid>
         </GroupBox>
-        <WpfPlot Grid.Row="1" Name="W_Plot" KeyDown="W_Plot_OnKeyDown" MouseEnter="W_Plot_OnMouseEnter"/>
+        <WpfPlot Grid.Row="1" Name="W_Plot" KeyDown="W_Plot_OnKeyDown" MouseEnter="W_Plot_OnMouseEnter" />
         <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Button Name="Bt_Text" Click="Bt_Text_OnClick"><StackPanel Orientation="Horizontal"><Image Source="Sum.png"/><TextBlock VerticalAlignment="Center" Text="Текстовый вывод ряда"/></StackPanel></Button>
-            <TextBlock Text="Нажмите 's' для того чтобы поставить точку на график, нажмите 'd' чтобы удалить ближайшую к курсору точку" VerticalAlignment="Center"/>
+            <Button Name="Bt_Text" Click="Bt_Text_OnClick">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Sum.png" /><TextBlock VerticalAlignment="Center" Text="Текстовый вывод ряда" />
+                </StackPanel>
+            </Button>
+            <TextBlock
+                Text="Нажмите 's' для того чтобы поставить точку на график, нажмите 'd' чтобы удалить ближайшую к курсору точку"
+                VerticalAlignment="Center" />
         </StackPanel>
     </Grid>
 </Window>

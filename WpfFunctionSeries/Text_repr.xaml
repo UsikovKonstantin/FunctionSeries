@@ -3,10 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:WpfFunctionSeries"
         mc:Ignorable="d"
         Title="Text_repr" Height="450" Width="800">
     <Grid>
-        <TextBlock Name="Block" TextWrapping="Wrap"/>
+        <TextBlock Name="Block" TextWrapping="Wrap" />
     </Grid>
 </Window>

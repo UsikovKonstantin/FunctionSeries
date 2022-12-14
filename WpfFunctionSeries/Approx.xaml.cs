@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using FunctionSeriesClassLibrary;
-using ScottPlot;
 
 namespace WpfFunctionSeries;
 
 public partial class Approx : Window
 {
+    private readonly List<(double x, double y)> point_cloud = new();
+
+    private int prev_scroll_value = 5;
+
     public Approx()
     {
         InitializeComponent();
@@ -21,8 +21,6 @@ public partial class Approx : Window
         W_Plot.Plot.AddPoint(0, 0);
         W_Plot.Plot.SetAxisLimits(cur_lim);
     }
-
-    private int prev_scroll_value = 5;
 
     private void Scr_Pow_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
@@ -37,8 +35,9 @@ public partial class Approx : Window
     private void Bt_Text_OnClick(object sender, RoutedEventArgs e)
     {
         if (!IsInitialized) return;
-        if (point_cloud.Count == 0) return; 
-        new Text_repr(Text_repr.Text_type.approx,fa:new(point_cloud, int.Parse(Tx_Terms_Input.Text))).Show();
+        if (point_cloud.Count == 0) return;
+        new Text_repr(Text_repr.Text_type.approx, fa: new FourierApprox(point_cloud, int.Parse(Tx_Terms_Input.Text)))
+            .Show();
     }
 
     private void Tx_Terms_Input_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -63,8 +62,6 @@ public partial class Approx : Window
         Calculate();
     }
 
-    private List<(double x, double y)> point_cloud = new();
-
     private void W_Plot_OnMouseEnter(object sender, MouseEventArgs e)
     {
         W_Plot.Focusable = true;
@@ -87,12 +84,12 @@ public partial class Approx : Window
         if (e.Key == Key.D && point_cloud.Count > 0)
         {
             var coord = W_Plot.GetMouseCoordinates();
-            double min_dist = double.MaxValue;
-            int min = 0;
-            for (int i = 0; i < point_cloud.Count; i++)
+            var min_dist = double.MaxValue;
+            var min = 0;
+            for (var i = 0; i < point_cloud.Count; i++)
             {
-                double dist = Math.Sqrt(Math.Pow(point_cloud[i].x - coord.x, 2) +
-                                        Math.Pow(point_cloud[i].y - coord.y, 2));
+                var dist = Math.Sqrt(Math.Pow(point_cloud[i].x - coord.x, 2) +
+                                     Math.Pow(point_cloud[i].y - coord.y, 2));
                 if (min_dist > dist)
                 {
                     min_dist = dist;
@@ -105,21 +102,19 @@ public partial class Approx : Window
         }
     }
 
-    void Calculate()
+    private void Calculate()
     {
         var cur_lim = W_Plot.Plot.GetAxisLimits();
         W_Plot.Plot.Clear();
-        foreach (var point in point_cloud)
-        {
-            W_Plot.Plot.AddPoint(point.x, point.y, Color.Blue);
-        }
+        foreach (var point in point_cloud) W_Plot.Plot.AddPoint(point.x, point.y, Color.Blue);
         W_Plot.Plot.SetAxisLimits(cur_lim);
         if (point_cloud.Count != 0)
         {
-            int precision =int.Parse(Tx_Terms_Input.Text);
+            var precision = int.Parse(Tx_Terms_Input.Text);
             FourierApprox fs = new(point_cloud, precision);
-            W_Plot.Plot.AddFunction((x) => fs.Compute(x), Color.Orange);
+            W_Plot.Plot.AddFunction(x => fs.Compute(x), Color.Orange);
         }
+
         W_Plot.Refresh();
     }
 }

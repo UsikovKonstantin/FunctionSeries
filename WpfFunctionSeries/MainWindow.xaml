@@ -52,8 +52,8 @@
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox x:Name="Tx_Tay_x_Input" Grid.Column="0" Text="0" TextChanged="General_Calc"/>
-                    <Slider Grid.Column="1" Orientation="Horizontal" Minimum="-100" Maximum="100" Value="0" Name="Scr_Tay_x" ValueChanged="Scr_Tay_x_ValueChanged"/>
+                    <TextBox x:Name="Tx_Tay_Terms_Input" Grid.Column="0" Text="5" TextChanged="General_Calc"/>
+                    <Slider Grid.Column="1" Orientation="Horizontal" Minimum="1" Maximum="100" Value="5" Name="Scr_Tay_Terms" ValueChanged="Scr_Tay_Terms_OnValueChanged"/>
                 </Grid>
             </GroupBox>
             <GroupBox Grid.Row="3" Header="Степень разложения в ряд Фурье">

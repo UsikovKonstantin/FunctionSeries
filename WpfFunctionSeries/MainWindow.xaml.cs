@@ -46,6 +46,8 @@ namespace WpfFunctionSeries
             if (Rb_Fourier.IsChecked.Value)
             {
                 GBox_Add_fun.Header = "Период функции";
+                Grid t = (Grid)GBox_Add_fun.Parent;
+                t.ColumnDefinitions[1].Width = new GridLength(110);
                 Grid_sub.RowDefinitions[2].Height = new GridLength(50);
                 Grid_sub.RowDefinitions[3].Height = new GridLength(50);
                 Grid_sub.RowDefinitions[4].Height = new GridLength(0);
@@ -53,7 +55,9 @@ namespace WpfFunctionSeries
             }
             else if (Rb_Taylor.IsChecked.Value)
             {
-                GBox_Add_fun.Header = "Количество коэф.";
+                GBox_Add_fun.Header = "Коэффинциент разложения";
+                Grid t = (Grid)GBox_Add_fun.Parent;
+                t.ColumnDefinitions[1].Width = new GridLength(200);
                 Grid_sub.RowDefinitions[2].Height = new GridLength(0);
                 Grid_sub.RowDefinitions[3].Height = new GridLength(0);
                 Grid_sub.RowDefinitions[4].Height = new GridLength(50);
@@ -81,8 +85,8 @@ namespace WpfFunctionSeries
             {
                 checks_terms_taylor();
                 checks_x0();
-                TaylorSeries ts = new(Tx_Fun_Input.Text, Double.Parse(Tx_Tay_x_Input.Text),
-                    int.Parse(Tx_Per_Input.Text));
+                TaylorSeries ts = new(Tx_Fun_Input.Text, Double.Parse(Tx_Per_Input.Text),
+                    int.Parse(Tx_Tay_Terms_Input.Text));
                 Update_Plot(ts);
             }
             
@@ -91,7 +95,7 @@ namespace WpfFunctionSeries
         void checks_terms_taylor()
         {
             // Проверка количества коэфициентов
-            List<char> symbols = new(Tx_Per_Input.Text);
+            List<char> symbols = new(Tx_Tay_Terms_Input.Text);
             // Удаление недопустимых символов
             for (var index = 0; index < symbols.Count; index++)
             {
@@ -106,13 +110,13 @@ namespace WpfFunctionSeries
             string corr = new(symbols.ToArray());
             if (corr.Length == 0) corr = "5";
             if (corr == "0") corr = "1";
-            Tx_Per_Input.Text = corr;
+            Tx_Tay_Terms_Input.Text = corr;
+            if (int.Parse(corr) < 101) Scr_Tay_Terms.Value = int.Parse(Tx_Tay_Terms_Input.Text);
         }
-
         void checks_x0()
         {
             // Проверка периода функции
-            List<char> symbols = new(Tx_Tay_x_Input.Text);
+            List<char> symbols = new(Tx_Per_Input.Text);
             // Удаление недопустимых символов
             for (var index = 0; index < symbols.Count; index++)
             {
@@ -159,9 +163,7 @@ namespace WpfFunctionSeries
             //Замена текущей строки на корректную
             string corr = new(symbols.ToArray());
             if (corr.Length == 0) corr = $"0";
-            Tx_Tay_x_Input.Text = corr;
-            // перевод слайдера на новое значение
-            if (double.Parse(corr) <= 100 && double.Parse(corr) >= -100) Scr_Tay_x.Value = double.Parse(corr);
+            Tx_Per_Input.Text = corr;
         }
         private void Update_Plot(FourierSeries fs)
         { // Работа с графиком
@@ -202,7 +204,7 @@ namespace WpfFunctionSeries
             for (double i = -max_x; i <= max_x; i += step)
             {
                 double val = fs.Compute(i);
-                double val2 = call_fun(i, pol);
+                double val2 = Interpreter.SolvePolishExpression(pol, new() { { 'x', i } });
                 min_y = Math.Min(val, min_y);
                 max_y = Math.Max(val, max_y);
                 min_y = Math.Min(val2, min_y);
@@ -335,16 +337,21 @@ namespace WpfFunctionSeries
             }
             else if (Rb_Taylor.IsChecked.Value)
             {
-                new Text_repr(Text_repr.Text_type.taylor, ts:new (Tx_Fun_Input.Text,Double.Parse(Tx_Tay_x_Input.Text),int.Parse(Tx_Per_Input.Text) )).Show();
+                new Text_repr(Text_repr.Text_type.taylor, ts:new (Tx_Fun_Input.Text,Double.Parse(Tx_Per_Input.Text),int.Parse(Tx_Per_Input.Text) )).Show();
             }
             
         }
 
-        private void Scr_Tay_x_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        int prev_scroll_value_Tay = 5;
+        private void Scr_Tay_Terms_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (!IsInitialized) return;
-            Tx_Tay_x_Input.Text = Scr_Tay_x.Value.ToString();
-            General_Calc(sender, e);
+            if (Math.Abs(Math.Round(Scr_Tay_Terms.Value) - prev_scroll_value_Tay) > 0.9)
+            {
+                prev_scroll_value_Tay = (int)Math.Round(Scr_Tay_Terms.Value);
+                Tx_Tay_Terms_Input.Text = prev_scroll_value_Tay.ToString();
+                General_Calc(sender, e);
+            }
         }
     }
 }

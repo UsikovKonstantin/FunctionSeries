@@ -103,9 +103,34 @@ namespace WpfFunctionSeries
         {
             string pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
             double TOLERANCE = 0.000001;
-            if (Math.Abs(solve_at(-1,pol) - solve_at(1,pol)) < TOLERANCE) Rb_Cos.IsChecked = true;
-            else if (Math.Abs(solve_at(1, pol) - (-solve_at(-1, pol))) < TOLERANCE) Rb_Sin.IsChecked = true;
-            else Rb_Asym.IsChecked = true;
+            List<(string type, int count)> types = new();
+            types.Add(("sin",0));
+            types.Add(("cos",0));
+            types.Add(("asim",0));
+            Random rand = new();
+            for (int i = 0; i < 1000; i++)
+            {
+                double val = rand.NextDouble() * 1000;
+                if (Math.Abs(solve_at(-val,pol) - solve_at(val,pol)) < TOLERANCE) types[1] = (types[1].type,types[1].count+1);
+                else if (Math.Abs(solve_at(val, pol) - (-solve_at(-val, pol))) < TOLERANCE) types[0] = (types[0].type,types[0].count+1);
+                else types[2] = (types[2].type,types[2].count+1);;    
+            }
+            types.Sort((x,y)=> -x.count.CompareTo(y.count));
+            switch (types[0].type)
+            {
+                case "sin":
+                    Rb_Sin.IsChecked = true;
+                    break;
+                case "cos":
+                    Rb_Cos.IsChecked = true;
+                    break;
+                case "asim":
+                    Rb_Asym.IsChecked = true;
+                    break;
+                default:
+                    break;
+            }
+            
         }
 
         double solve_at(double x, string polish)

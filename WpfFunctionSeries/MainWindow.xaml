@@ -46,7 +46,7 @@
                     <RadioButton Name="Rb_Taylor" Content="Разложение в ряд Тейлора" Click="General_Calc"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Grid.Row="4" Header="Коэффициент разложения">
+            <GroupBox Grid.Row="4" Header="Степень разложения в ряд Тейлора">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100"/>

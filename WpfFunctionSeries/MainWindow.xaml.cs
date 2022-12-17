@@ -402,7 +402,7 @@ public partial class MainWindow : Window
         {
             new Text_repr(Text_repr.Text_type.taylor,
                     ts: new TaylorSeries(Tx_Fun_Input.Text, double.Parse(Tx_Per_Input.Text),
-                        int.Parse(Tx_Per_Input.Text)))
+                        int.Parse(Tx_Tay_Terms_Input.Text)))
                 .Show();
         }
     }

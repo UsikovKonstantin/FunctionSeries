@@ -4,8 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
-        Title="Text_repr" Height="450" Width="800">
+        Title="Text_repr" Height="450" Width="800" FontSize="20">
     <Grid>
-        <TextBlock Name="Block" TextWrapping="Wrap" />
+        <TextBox Name="Block" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True"/>
     </Grid>
 </Window>

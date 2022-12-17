@@ -41,21 +41,21 @@ public partial class MainWindow : Window
         {
             GBox_Add_fun.Header = "Период функции";
             var t = (Grid)GBox_Add_fun.Parent;
-            t.ColumnDefinitions[1].Width = new GridLength(110);
-            Grid_sub.RowDefinitions[2].Height = new GridLength(50);
-            Grid_sub.RowDefinitions[3].Height = new GridLength(50);
+            t.ColumnDefinitions[1].Width = new GridLength(170);
+            Grid_sub.RowDefinitions[2].Height = new GridLength(110);
+            Grid_sub.RowDefinitions[3].Height = new GridLength(70);
             Grid_sub.RowDefinitions[4].Height = new GridLength(0);
-            Grid_main.RowDefinitions[0].Height = new GridLength(200);
+            Grid_main.RowDefinitions[0].Height = new GridLength(320);
         }
         else if (Rb_Taylor.IsChecked.Value)
         {
             GBox_Add_fun.Header = "Коэффинциент разложения";
             var t = (Grid)GBox_Add_fun.Parent;
-            t.ColumnDefinitions[1].Width = new GridLength(200);
+            t.ColumnDefinitions[1].Width = new GridLength(270);
             Grid_sub.RowDefinitions[2].Height = new GridLength(0);
             Grid_sub.RowDefinitions[3].Height = new GridLength(0);
-            Grid_sub.RowDefinitions[4].Height = new GridLength(50);
-            Grid_main.RowDefinitions[0].Height = new GridLength(150);
+            Grid_sub.RowDefinitions[4].Height = new GridLength(70);
+            Grid_main.RowDefinitions[0].Height = new GridLength(210);
         }
     }
 

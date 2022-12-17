@@ -4,25 +4,25 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Series Transforms" Height="800" Width="1200">
+        Title="Series Transforms" Height="800" Width="1200" FontSize="20">
     <Grid Name="Grid_main">
         <Grid.RowDefinitions>
-            <RowDefinition Height="250" />
+            <RowDefinition Height="390" />
             <RowDefinition Height="200*" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <Grid Name="Grid_sub" Grid.Row="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
-                <RowDefinition Height="50" />
+                <RowDefinition Height="70" />
+                <RowDefinition Height="70" />
+                <RowDefinition Height="110" />
+                <RowDefinition Height="70" />
+                <RowDefinition Height="70" />
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="110" />
+                    <ColumnDefinition Width="170" />
                 </Grid.ColumnDefinitions>
                 <GroupBox Grid.Column="0" Header="Функция">
                     <TextBox x:Name="Tx_Fun_Input" TextChanged="General_Calc" />
@@ -33,11 +33,11 @@
             </Grid>
 
             <GroupBox Grid.Row="2" Header="Тип разложения функции">
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Vertical" >
                     <RadioButton Name="Rb_Cos" Content="По косинусам (функция симметрична относительно вертикали)"
                                  Click="General_Calc" />
                     <RadioButton Name="Rb_Sin"
-                                 Content="По синусам (функция симметрична относительно вертикали и горизотали)"
+                                 Content="По синусам (функция симметрична относительно центра координат)"
                                  Click="General_Calc" />
                     <RadioButton Name="Rb_Asym" Content="Функция аморфна (не обладает симметрией)" IsChecked="True"
                                  Click="General_Calc" />

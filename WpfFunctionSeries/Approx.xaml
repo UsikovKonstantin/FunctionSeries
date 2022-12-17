@@ -4,10 +4,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
-        Title="Approx" Height="450" Width="800">
+        Title="Approx" Height="450" Width="1300" FontSize="20">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
+            <RowDefinition Height="70" />
             <RowDefinition Height="1*" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>

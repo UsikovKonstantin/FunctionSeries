@@ -20,16 +20,18 @@ namespace FunctionSeriesClassLibrary {
                 if (IsDelimeter(input[i])) continue;
 
                 if (IsOperator(input[i])) {
-                    if (input[i] == '(')
-                        operStack.Push(input[i].ToString());
-                    else if (input[i] == ')') {
+                    if (input[i] == '(') {
+                        operStack.Push((holdMinus ? "-" : "") + input[i].ToString());
+                        holdMinus = false;
+                    } else if (input[i] == ')') {
                         // Выписываем все операторы до открывающей скобки в строку
                         string s = operStack.Pop();
 
-                        while (s != "(") {
+                        while (s != "(" && s != "-(") {
                             output += s.ToString() + ' ';
                             s = operStack.Pop();
                         }
+                        if (s == "-(") output += "_" + ' ';
                     } else {
                         if (!isPrevElOper) {
                             while (operStack.Count > 0 && GetPriority(input[i].ToString()) <= GetPriority(operStack.Peek().ToString()))
@@ -187,7 +189,7 @@ namespace FunctionSeriesClassLibrary {
 
         // Метод возвращает true, если проверяемый символ - оператор
         private static bool IsOperator(char с) {
-            if (("+-/÷:*×^()!".IndexOf(с) != -1))
+            if (("+-/÷:*×^()!_".IndexOf(с) != -1))
                 return true;
             return false;
         }
@@ -204,11 +206,13 @@ namespace FunctionSeriesClassLibrary {
 
         // Метод возвращает приоритет оператора
         private static int GetPriority(string s) {
-            if (s.Length > 1 || s == "√" || s == "!") return 6;
+            if (s.Length > 1 && s != "-(" || s == "√" || s == "!") return 6;
             switch (s) {
                 case "(": return 0;
+                case "-(": return 0;
                 case ")": return 1;
                 case "+": return 2;
+                case "_": return 2;
                 case "-": return 2;
                 case "*": return 3;
                 case "/": return 3;
@@ -231,6 +235,9 @@ namespace FunctionSeriesClassLibrary {
                 } else {
                     return -firstVal;
                 }
+            } else if (oper == "_") {
+                double firstVal = values.Pop();
+                return -firstVal;
             } else if (oper == "*" || oper == "×") {
                 double firstVal = values.Pop();
                 double secondVal = values.Pop();

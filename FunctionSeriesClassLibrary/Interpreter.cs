@@ -20,7 +20,7 @@ namespace FunctionSeriesClassLibrary {
 
                 if (IsOperator(input[i])) HandleOperator(input[i], operStack, ref output, ref isPrevElOper, ref holdMinus);
                 else if (IsFunction(i, input)) HandleFunction(input, ref i, operStack, ref isPrevElOper, ref holdMinus);
-                else if (IsValue(input[i])) HandlerValue(input, ref i, ref output, ref isPrevElOper, ref holdMinus);
+                else if (IsValue(input[i])) HandleValue(input, ref i, ref output, ref isPrevElOper, ref holdMinus);
             }
 
             // Когда прошли по всем символам, выкидываем из стека все оставшиеся там операции в строку
@@ -42,7 +42,7 @@ namespace FunctionSeriesClassLibrary {
             foreach (string cur in polishNotation) {
                 if (!IsFunction(0, cur)) {
                     if (cur.Length == 1 && IsOperator(char.Parse(cur))) {
-                        //  Вычисление значений в зависимости от операции
+                        // Вычисление значений в зависимости от операции
                         double result = ComputeOperation(cur, values);
                         values.Push(result);
                     } else values.Push(double.Parse(cur));
@@ -124,7 +124,7 @@ namespace FunctionSeriesClassLibrary {
                     output += s.ToString() + ' ';
                     s = operStack.Pop();
                 }
-                if (s == "-(") output += "_" + ' ';
+                if (s == "-(") operStack.Push("_");
             } else {
                 if (!isPrevElOper) {
                     while (operStack.Count > 0 && GetPriority(oper.ToString()) <= GetPriority(operStack.Peek().ToString()))
@@ -178,7 +178,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="output">результат - польская запись</param>
         /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
         /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
-        private static void HandlerValue(string input, ref int i, ref string output, ref bool isPrevElOper, ref bool holdMinus) {
+        private static void HandleValue(string input, ref int i, ref string output, ref bool isPrevElOper, ref bool holdMinus) {
             if (holdMinus) {
                 output += "-";
                 holdMinus = false;

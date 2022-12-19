@@ -3,94 +3,39 @@ using System.Collections.Generic;
 
 namespace FunctionSeriesClassLibrary {
     public static class Interpreter {
-        // Метод возвращает обратную польскую запись
+        /// <summary>
+        /// Возвращает польскую запись в строчном виде
+        /// </summary>
+        /// <param name="input">фунция в строчном виде</param>
+        /// <returns>польская запись</returns>
         public static string GetPolishExpression(string input) {
             input = input.Trim();
             string output = "";
             Stack<string> operStack = new Stack<string>();
 
-            int i = 0;
             bool holdMinus = false;
-            bool isPrevElOper = false;
-            if (input[0] == '-') {
-                holdMinus = true;
-                i = 1;
-            }
-            for (; i < input.Length; i++) {
+            bool isPrevElOper = true;
+            for (int i = 0; i < input.Length; i++) {
                 if (IsDelimeter(input[i])) continue;
 
-                if (IsOperator(input[i])) {
-                    if (input[i] == '(') {
-                        operStack.Push((holdMinus ? "-" : "") + input[i].ToString());
-                        holdMinus = false;
-                    } else if (input[i] == ')') {
-                        // Выписываем все операторы до открывающей скобки в строку
-                        string s = operStack.Pop();
-
-                        while (s != "(" && s != "-(") {
-                            output += s.ToString() + ' ';
-                            s = operStack.Pop();
-                        }
-                        if (s == "-(") output += "_" + ' ';
-                    } else {
-                        if (!isPrevElOper) {
-                            while (operStack.Count > 0 && GetPriority(input[i].ToString()) <= GetPriority(operStack.Peek().ToString()))
-                                output += operStack.Pop().ToString() + " ";
-                        }
-
-                        if (input[i] == '-' && isPrevElOper) holdMinus = true;
-                        else operStack.Push(input[i].ToString());
-
-                    }
-                    if (input[i] != ')' && input[i] != '!') isPrevElOper = true;
-                } else if (IsFunction(i, input)) {
-                    HashSet<string> possibleFuncs = new HashSet<string>() { "sin", "cos", "tan", "ctan", "arcsin", "arccos", "atan", "actan", "log", "ln", "sqrt", "√", "sinh", "cosh", "-sin", "-cos", "-tan", "-ctan", "-arcsin", "-arccos", "-atan", "-actan", "-log", "-ln", "-sqrt", "-√", "-sinh", "-cosh", };
-                    string func = "";
-                    if (holdMinus) {
-                        func += "-";
-                        holdMinus = false;
-                    }
-                    // Читаем до разделителя или оператора, чтобы получить число
-                    while (!IsDelimeter(input[i]) && !IsOperator(input[i])) {
-                        func += input[i];
-                        i++;
-
-                        if (possibleFuncs.Contains(func)) break;
-                        // Если символ - последний, то выходим из цикла
-                        if (i == input.Length) break;
-                    }
-                    if (!possibleFuncs.Contains(func)) throw new Exception("Выражение введено не верно");
-                    operStack.Push(func);
-
-                    i--;
-                    isPrevElOper = false;
-                } else if (char.IsDigit(input[i]) || char.IsLetter(input[i])) {
-                    if (holdMinus) {
-                        output += "-";
-                        holdMinus = false;
-                    }
-                    // Читаем до разделителя или оператора, чтобы получить число
-                    while (!IsDelimeter(input[i]) && !IsOperator(input[i])) {
-                        output += input[i];
-                        i++;
-
-                        // Если символ - последний, то выходим из цикла
-                        if (i == input.Length) break;
-                    }
-
-                    output += ' ';
-                    i--;
-                    isPrevElOper = false;
-                }
+                if (IsOperator(input[i])) HandleOperator(input[i], operStack, ref output, ref isPrevElOper, ref holdMinus);
+                else if (IsFunction(i, input)) HandleFunction(input, ref i, operStack, ref isPrevElOper, ref holdMinus);
+                else if (IsValue(input[i])) HandlerValue(input, ref i, ref output, ref isPrevElOper, ref holdMinus);
             }
 
-            // Когда прошли по всем символам, выкидываем из стека все оставшиеся там операторы в строку
+            // Когда прошли по всем символам, выкидываем из стека все оставшиеся там операции в строку
             while (operStack.Count > 0)
                 output += operStack.Pop() + " ";
 
             return output;
         }
 
+        /// <summary>
+        /// Решает польскую запись
+        /// </summary>
+        /// <param name="s">польская запись</param>
+        /// <param name="variables">переменные, необходимые для решения польской записи</param>
+        /// <returns>число</returns>
         public static double SolvePolishExpression(string s, Dictionary<char, double> variables) {
             Stack<double> values = new Stack<double>();
             string[] polishNotation = ConvertVarsToNums(s.Trim().Split(' '), variables);
@@ -111,90 +56,34 @@ namespace FunctionSeriesClassLibrary {
             return values.Pop();
         }
 
-        // Есть ли переменные в выражении
-        public static bool IsVarInPolExpression(string s) {
-            string[] polishNotation = GetPolishExpression(s).Trim().Split(' ');
-
-            for (int i = 0; i < polishNotation.Length; i++) {
-                // Если текущий элемент - переменная
-                bool isConst = polishNotation[i] == "e" || polishNotation[i] == "π" || polishNotation[i] == "-e" || polishNotation[i] == "-π";
-                bool isVar = polishNotation[i].Length == 1 && char.IsLetter(char.Parse(polishNotation[i]));
-                bool isVarWithMinus = polishNotation[i].Length == 2 && polishNotation[i][0] == '-' && char.IsLetter(polishNotation[i][1]);
-                if (isVar || isVarWithMinus && !isConst) return true;
-            }
-
-            return false;
-        }
-
-        public static string GetLexems(string s) {
-            string res = "";
-            for (int i = 0; i < s.Length; i++) {
-                if (IsDelimeter(s[i])) continue;
-
-                string type = "";
-                string value = "";
-                string priority = "";
-                if (IsOperator(s[i])) {
-                    if (s[i] == '(') type = "left_bracket";
-                    else if (s[i] == ')') type = "right_bracket";
-                    else type = "operation_sign";
-
-                    value = s[i].ToString();
-                    priority = GetPriority(value).ToString();
-                } else if (IsFunction(i, s)) {
-                    type = "function";
-
-                    HashSet<string> possibleFuncs = new HashSet<string>() { "sin", "cos", "tan", "ctan", "arcsin", "arccos", "atan", "actan", "log", "ln", "sqrt", "√", "sinh", "cosh", "-sin", "-cos", "-tan", "-ctan", "-arcsin", "-arccos", "-atan", "-actan", "-log", "-ln", "-sqrt", "-√", "-sinh", "-cosh", };
-                    value = "";
-                    // Читаем до разделителя или оператора, чтобы получить число
-                    while (!IsDelimeter(s[i]) && !IsOperator(s[i])) {
-                        value += s[i];
-                        i++;
-
-                        if (possibleFuncs.Contains(value)) break;
-                        // Если символ - последний, то выходим из цикла
-                        if (i == s.Length) break;
-                    }
-                    if (!possibleFuncs.Contains(value)) throw new Exception("Выражение введено не верно");
-
-                    priority = GetPriority(value).ToString();
-                    i--;
-                } else if (char.IsDigit(s[i]) || char.IsLetter(s[i])) {
-                    if (char.IsDigit(s[i]) || s[i] == 'e' || s[i] == 'π') type = "number";
-                    else if (char.IsLetter(s[i])) type = "indetificator";
-
-                    value = "";
-                    // Читаем до разделителя или оператора, чтобы получить число
-                    while (!IsDelimeter(s[i]) && !IsOperator(s[i])) {
-                        value += s[i];
-                        i++;
-
-                        // Если символ - последний, то выходим из цикла
-                        if (i == s.Length) break;
-                    }
-
-                    i--;
-                }
-                res += $"type={type}; value={value}; {(priority != "" ? "priority=" + priority : "")}\n";
-            }
-            return res;
-        }
-
-        // Метод возвращает true, если проверяемый символ - пробел
+        /// <summary>
+        /// Проверяет если симовол является разделителем
+        /// </summary>
+        /// <param name="c">проверяемый символ</param>
+        /// <returns>True - если символ разделитель, иначе - False</returns>
         private static bool IsDelimeter(char c) {
             if ((" ".IndexOf(c) != -1))
                 return true;
             return false;
         }
 
-        // Метод возвращает true, если проверяемый символ - оператор
+        /// <summary>
+        /// Проверяет если симовол является оператором
+        /// </summary>
+        /// <param name="c">проверяемый символ</param>
+        /// <returns>True - если символ оператор, иначе - False</returns>
         private static bool IsOperator(char с) {
             if (("+-/÷:*×^()!_".IndexOf(с) != -1))
                 return true;
             return false;
         }
 
-        // Метод возвращает true, если проверяемый символ - функция
+        /// <summary>
+        /// Проверяет если подстрока является функцией
+        /// </summary>
+        /// <param name="idx">индекс с которого нужно начать</param>
+        /// <param name="s">исходная строка</param>
+        /// <returns>True - если подстрока фукнция, иначе - False</returns>
         private static bool IsFunction(int idx, string s) {
             bool isFunction = idx <= s.Length - 2 && char.IsLetter(s[idx]) && char.IsLetter(s[idx + 1]);
             bool isFunctionWithMinus = idx <= s.Length - 3 && s[idx] == '-' && char.IsLetter(s[idx + 1]) && char.IsLetter(s[idx + 2]);
@@ -204,9 +93,116 @@ namespace FunctionSeriesClassLibrary {
             return false;
         }
 
-        // Метод возвращает приоритет оператора
+        /// <summary>
+        /// Проверяет если символ значение(число/переменная)
+        /// </summary>
+        /// <param name="c">проверяемый символ</param>
+        /// <returns>True - если символ значение, иначе - False</returns>
+        private static bool IsValue(char c) {
+            if (char.IsDigit(c) || char.IsLetter(c))
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Метод ответственный за работу с оператороми при переводе функции в польскую запись
+        /// </summary>
+        /// <param name="oper">оператор</param>
+        /// <param name="operStack">стэк операций</param>
+        /// <param name="output">результат - польская запись</param>
+        /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
+        /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
+        private static void HandleOperator(char oper, Stack<string> operStack, ref string output, ref bool isPrevElOper, ref bool holdMinus) {
+            if (oper == '(') {
+                operStack.Push((holdMinus ? "-" : "") + oper.ToString());
+                holdMinus = false;
+            } else if (oper == ')') {
+                // Выписываем все операторы до открывающей скобки в строку
+                string s = operStack.Pop();
+
+                while (s != "(" && s != "-(") {
+                    output += s.ToString() + ' ';
+                    s = operStack.Pop();
+                }
+                if (s == "-(") output += "_" + ' ';
+            } else {
+                if (!isPrevElOper) {
+                    while (operStack.Count > 0 && GetPriority(oper.ToString()) <= GetPriority(operStack.Peek().ToString()))
+                        output += operStack.Pop().ToString() + " ";
+                }
+
+                if (oper == '-' && isPrevElOper) holdMinus = true;
+                else operStack.Push(oper.ToString());
+
+            }
+            if (oper != ')' && oper != '!') isPrevElOper = true;
+        }
+
+        /// <summary>
+        /// Метод ответственный за работу с функциями при переводе функции в польскую запись
+        /// </summary>
+        /// <param name="input">исходная строка</param>
+        /// <param name="i">индекс с которого нужно начать</param>
+        /// <param name="operStack">стэк операций</param>
+        /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
+        /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
+        /// <exception cref="Exception">если функция не существует</exception>
+        private static void HandleFunction(string input, ref int i, Stack<string> operStack, ref bool isPrevElOper, ref bool holdMinus) {
+            HashSet<string> possibleFuncs = new HashSet<string>() { "sin", "cos", "tan", "ctan", "asin", "acos", "atan", "actan", "log", "ln", "sqrt", "√", "-sin", "-cos", "-tan", "-ctan", "-asin", "-acos", "-atan", "-actan", "-log", "-ln", "-sqrt", "-√" };
+            string func = "";
+            if (holdMinus) {
+                func += "-";
+                holdMinus = false;
+            }
+            // Читаем до разделителя или оператора, чтобы получить число
+            while (!IsDelimeter(input[i]) && !IsOperator(input[i])) {
+                func += input[i];
+                i++;
+
+                if (possibleFuncs.Contains(func)) break;
+                // Если символ - последний, то выходим из цикла
+                if (i == input.Length) break;
+            }
+            if (!possibleFuncs.Contains(func)) throw new Exception("Выражение введено не верно");
+            operStack.Push(func);
+
+            i--;
+            isPrevElOper = false;
+        }
+
+        /// <summary>
+        /// Метод ответственный за работу с значения при переводе функции в польскую запись
+        /// </summary>
+        /// <param name="input">исходная строка</param>
+        /// <param name="i">индекс с которого нужно начать</param>
+        /// <param name="output">результат - польская запись</param>
+        /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
+        /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
+        private static void HandlerValue(string input, ref int i, ref string output, ref bool isPrevElOper, ref bool holdMinus) {
+            if (holdMinus) {
+                output += "-";
+                holdMinus = false;
+            }
+            // Читаем до разделителя или оператора, чтобы получить число
+            while (!IsDelimeter(input[i]) && !IsOperator(input[i])) {
+                output += input[i];
+                i++;
+
+                // Если символ - последний, то выходим из цикла
+                if (i == input.Length) break;
+            }
+
+            output += ' ';
+            i--;
+            isPrevElOper = false;
+        }
+
+        /// <summary>
+        /// Возвращает приоритет оператора/функции/скобки
+        /// </summary>
+        /// <param name="s">проверяемый оператор/функция/скобка</param>
+        /// <returns>приоритет в виде числа</returns>
         private static int GetPriority(string s) {
-            if (s.Length > 1 && s != "-(" || s == "√" || s == "!") return 6;
             switch (s) {
                 case "(": return 0;
                 case "-(": return 0;
@@ -221,100 +217,138 @@ namespace FunctionSeriesClassLibrary {
             }
         }
 
-        // Выполнение операций
+        /// <summary>
+        /// Вычисление операции при решение польской записи
+        /// </summary>
+        /// <param name="oper">операция</param>
+        /// <param name="values">стэк значений</param>
+        /// <returns>результат вычисления операции</returns>
+        /// <exception cref="Exception">если данная операция не существует</exception>
         private static double ComputeOperation(string oper, Stack<double> values) {
-            if (oper == "+") {
-                double firstVal = values.Pop();
-                double secondVal = values.Pop();
-                return firstVal + secondVal;
-            } else if (oper == "-") {
-                double firstVal = values.Pop();
-                if (values.Count > 0) {
-                    double secondVal = values.Pop();
-                    return secondVal - firstVal;
-                } else {
-                    return -firstVal;
-                }
-            } else if (oper == "_") {
-                double firstVal = values.Pop();
-                return -firstVal;
-            } else if (oper == "*" || oper == "×") {
-                double firstVal = values.Pop();
-                double secondVal = values.Pop();
-                return secondVal * firstVal;
-            } else if (oper == "/" || oper == ":" || oper == "÷") {
-                double firstVal = values.Pop();
-                double secondVal = values.Pop();
-                return secondVal / firstVal;
-            } else if (oper == "^") {
-                double firstVal = values.Pop();
-                double secondVal = values.Pop();
-                return Math.Pow(secondVal, firstVal);
-            } else if (oper == "!") {
-                double firstVal = values.Pop();
-                double res = 1;
-                for (int i = 2; i <= firstVal; i++) {
-                    res *= i;
-                }
-                return res;
-            } else if (oper == "log" || oper == "-log") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Log10(firstVal);
-                return Math.Log10(firstVal);
-            } else if (oper == "ln" || oper == "-ln") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Log(firstVal);
-                return Math.Log(firstVal);
-            } else if (oper == "sin" || oper == "-sin") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Sin(firstVal);
-                return Math.Sin(firstVal);
-            } else if (oper == "cos" || oper == "-cos") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Cos(firstVal);
-                return Math.Cos(firstVal);
-            } else if (oper == "tan" || oper == "-tan") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Tan(firstVal);
-                return Math.Tan(firstVal);
-            } else if (oper == "ctan" || oper == "-ctan") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -1 / Math.Tan(firstVal);
-                return 1 / Math.Tan(firstVal);
-            } else if (oper == "arcsin" || oper == "-arcsin") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Asin(firstVal);
-                return Math.Asin(firstVal);
-            } else if (oper == "arccos" || oper == "-arccos") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Acos(firstVal);
-                return Math.Acos(firstVal);
-            } else if (oper == "atan" || oper == "-atan") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Atan(firstVal);
-                return Math.Atan(firstVal);
-            } else if (oper == "actan" || oper == "-actan") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -1 / Math.Atan(firstVal);
-                return 1 / Math.Atan(firstVal);
-            } else if (oper == "sqrt" || oper == "√" || oper == "-sqrt" || oper == "-√") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Sqrt(firstVal);
-                return Math.Sqrt(firstVal);
-            } else if (oper == "sinh" || oper == "-sinh") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Sinh(firstVal);
-                return Math.Sinh(firstVal);
-            } else if (oper == "cosh" || oper == "-cosh") {
-                double firstVal = values.Pop();
-                if (oper[0] == '-') return -Math.Cosh(firstVal);
-                return Math.Cosh(firstVal);
-            } else {
-                throw new Exception("Несуществующая функция или оператор");
+            switch (oper) {
+                case "+": {
+                        double firstVal = values.Pop();
+                        double secondVal = values.Pop();
+                        return firstVal + secondVal;
+                    }
+                case "-": {
+                        double firstVal = values.Pop();
+                        if (values.Count > 0) {
+                            double secondVal = values.Pop();
+                            return secondVal - firstVal;
+                        } else {
+                            return -firstVal;
+                        }
+                    }
+                case "_": {
+                        double firstVal = values.Pop();
+                        return -firstVal;
+                    }
+                case "*":
+                case "×": {
+                        double firstVal = values.Pop();
+                        double secondVal = values.Pop();
+                        return secondVal * firstVal;
+                    }
+                case "/":
+                case ":":
+                case "÷": {
+                        double firstVal = values.Pop();
+                        double secondVal = values.Pop();
+                        return secondVal / firstVal;
+                    }
+                case "^": {
+                        double firstVal = values.Pop();
+                        double secondVal = values.Pop();
+                        return Math.Pow(secondVal, firstVal);
+                    }
+                case "!": {
+                        double firstVal = values.Pop();
+                        double res = 1;
+                        for (int i = 2; i <= firstVal; i++) {
+                            res *= i;
+                        }
+                        return res;
+                    }
+                case "log":
+                case "-log": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -Math.Log10(firstVal);
+                        return Math.Log10(firstVal);
+                    }
+                case "ln":
+                case "-ln": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -Math.Log(firstVal);
+                        return Math.Log(firstVal);
+                    }
+                case "sin":
+                case "-sin": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -Math.Sin(firstVal);
+                        return Math.Sin(firstVal);
+                    }
+                case "cos":
+                case "-cos": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -Math.Cos(firstVal);
+                        return Math.Cos(firstVal);
+                    }
+                case "tan":
+                case "-tan": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -Math.Tan(firstVal);
+                        return Math.Tan(firstVal);
+                    }
+                case "ctan":
+                case "-ctan": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -1 / Math.Tan(firstVal);
+                        return 1 / Math.Tan(firstVal);
+                    }
+                case "asin":
+                case "-asin": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -Math.Asin(firstVal);
+                        return Math.Asin(firstVal);
+                    }
+                case "acos":
+                case "-acos": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -Math.Acos(firstVal);
+                        return Math.Acos(firstVal);
+                    }
+                case "atan":
+                case "-atan": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -Math.Atan(firstVal);
+                        return Math.Atan(firstVal);
+                    }
+                case "actan":
+                case "-actan": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -1 / Math.Atan(firstVal);
+                        return 1 / Math.Atan(firstVal);
+                    }
+                case "sqrt":
+                case "√":
+                case "-sqrt":
+                case "-√": {
+                        double firstVal = values.Pop();
+                        if (oper[0] == '-') return -Math.Sqrt(firstVal);
+                        return Math.Sqrt(firstVal);
+                    }
+                default: throw new Exception("Несуществующая функция или оператор");
             }
         }
 
-        // Заменить переменные на числа
+        /// <summary>
+        /// Заменяет перменные на числа в польской записи
+        /// </summary>
+        /// <param name="polishNotation">польская запись</param>
+        /// <param name="variables">переменные и соответствующее число для этой переменной</param>
+        /// <returns>польская запись, вместо переменных - числа</returns>
+        /// <exception cref="ApplicationException">если переменной в польской записи нет в словаре variables</exception>
         private static string[] ConvertVarsToNums(string[] polishNotation, Dictionary<char, double> variables) {
             for (int i = 0; i < polishNotation.Length; i++) {
                 // Если текущий элемент - переменная

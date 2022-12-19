@@ -46,7 +46,7 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 
 //Console.WriteLine(TaylorSeries("x^2+2", 2));
 
-TaylorSeries test = new TaylorSeries("ln((1+x)/(1-x))", 0, 5);
+TaylorSeries test = new TaylorSeries("acos(x)", 0, 5);
 Console.WriteLine(test);
 
 //Console.WriteLine(FunctionHelper.GetType("x"));

@@ -1,3 +1,4 @@
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FunctionSeriesClassLibrary;
 using System.Collections.Generic;
@@ -66,6 +67,26 @@ namespace FunctionSeriesTest
         [TestMethod]
         public void TestMethod1()
         {
+        }
+    }
+
+    [TestClass]
+    public class AproxximationTest
+    {
+        [TestMethod]
+        public void TestFastVsSlow()
+        {
+            List<(double x, double y)> point_cloud = new();
+            Random rand = new Random();
+            for (int i = 0; i < 1000; i++)
+            {
+                point_cloud.Add(((rand.NextDouble()-0.5)*2000,(rand.NextDouble()-0.5)*2000));
+            }
+
+            var FSlow = new FourierApprox(point_cloud, 100, FourierApprox.transform_type.slow);
+            var FFast = new FourierApprox(point_cloud, 100, FourierApprox.transform_type.fast);
+            var TestPoint = (rand.NextDouble() - 0.5) * 2000;
+            Assert.AreEqual(FSlow.Compute(TestPoint),FFast.Compute(TestPoint), 1E-6);
         }
     }
 }

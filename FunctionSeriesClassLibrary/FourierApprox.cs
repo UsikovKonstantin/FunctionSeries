@@ -13,19 +13,35 @@ public class FourierApprox
     private int num_points = 0; // Количество точек в аппроксимации
     private double period = 0.0; // Период ряда 
     private int Frequncy_Count = 0; // Количество частот
-    
+
+    public enum transform_type
+    {
+        slow,
+        fast
+    }
     /// <summary>
     /// Получение ряда Фурье посредством поля точек (Тип 2)
     /// </summary>
     /// <param name="point_cloud">Поле точек</param>
     /// /// <param name="precision">Сколько нужно частот</param>
-    public FourierApprox(List<(double x, double y)> point_cloud, int precision)
+    public FourierApprox(List<(double x, double y)> point_cloud, int precision, transform_type type )
     {
-        num_points = point_cloud.Count;
-        Point_cloud = point_cloud;
-        Frequncy_Count = precision;
-        period = Get_Period();
-        NDFT_Coefficients();
+        switch (type)
+        {
+            case transform_type.slow:
+                num_points = point_cloud.Count;
+                Point_cloud = point_cloud;
+                Frequncy_Count = precision;
+                period = Get_Period();
+                NDFT_Coefficients();
+                break;
+            case transform_type.fast:
+                throw new NotImplementedException();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
+        
     }
     /// <summary>
     /// Период ряда по полю точек

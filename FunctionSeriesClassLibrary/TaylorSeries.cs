@@ -57,7 +57,7 @@ namespace FunctionSeriesClassLibrary {
                 Expr derivative = prevDerivative.Differentiate(x);
                 string pol = Interpreter.GetPolishExpression(derivative.ToString());
                 Coefs[i] = Interpreter.SolvePolishExpression(pol, new Dictionary<char, double>() { { 'x', X0 } });
-                int factorial = 1;
+                double factorial = 1;
                 for (int j = 2; j <= i; j++) factorial *= j;
                 Coefs[i] /= factorial;
                 prevDerivative = derivative;

@@ -46,8 +46,19 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 
 //Console.WriteLine(TaylorSeries("x^2+2", 2));
 
-TaylorSeries test = new TaylorSeries("acos(x)", 0, 5);
+TaylorSeries test = new TaylorSeries("sin(x)", 0, 5);
+TaylorSeries test2 = new TaylorSeries("cos(x)", 0, 5);
 Console.WriteLine(test);
+Console.WriteLine(test2);
+Console.WriteLine(-test2);
+//Console.WriteLine(test.GetIntegral());
+//Console.WriteLine(test.GetIntegral().GetIntegral());
+//Console.WriteLine(test.GetIntegral().GetIntegral().Compute(2));
+//Console.WriteLine(test.GetDerivative());
+//Console.WriteLine(test.GetDerivative().GetDerivative());
+//Console.WriteLine(test.GetDerivative().GetDerivative().GetDerivative());
+//Console.WriteLine(test.GetDerivative().GetDerivative().GetDerivative().GetDerivative());
+//Console.WriteLine(test.GetDerivative().GetDerivative().GetDerivative().GetDerivative().GetDerivative());
 
 //Console.WriteLine(FunctionHelper.GetType("x"));
 //Console.WriteLine(FunctionHelper.GetType("x^3"));

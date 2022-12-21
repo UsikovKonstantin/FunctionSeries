@@ -63,7 +63,20 @@ namespace FunctionSeriesClassLibrary
         }
 
         /// <summary>
-        /// Конструктор ряда Фурье.
+        /// Конструктор по умолчанию.
+        /// Создаёт ряд sin(x) + cos(x).
+        /// </summary>
+        public FourierSeries()
+        {
+            n = 1;
+            a = new double[] { 0, 1 };
+            b = new double[] { 0, 1 };
+            l = Math.PI;
+            type = FourierSeriesType.CosSin;
+        }
+
+        /// <summary>
+        /// Конструктор ряда Фурье по функции.
         /// </summary>
         /// <param name="n"> количество членов </param>
         /// <param name="period"> период функции </param>
@@ -78,6 +91,22 @@ namespace FunctionSeriesClassLibrary
             b = new double[n + 1];
             string polFunc = Interpreter.GetPolishExpression(function);
             FindCoefs(polFunc);
+        }
+
+        /// <summary>
+        /// Конструктор ряда Фурье по массивам коэффициентов.
+        /// </summary>
+        /// <param name="A"> коэффициенты при косинусах </param>
+        /// <param name="B"> коэффициенты при синусах </param>
+        /// <param name="period"> период функции </param>
+        /// <param name="type"> тип ряда </param>
+        public FourierSeries(double[] A, double[] B, double period, FourierSeriesType type)
+        {
+            n = A.Length - 1;
+            a = A;
+            b = B;
+            l = period / 2;
+            this.type = type;
         }
 
         /// <summary>
@@ -202,6 +231,133 @@ namespace FunctionSeriesClassLibrary
             res *= 0.5 * step;
             return res;
         }
-        
+
+        /// <summary>
+        /// Почленное дифференцирование ряда Фурье.
+        /// </summary>
+        /// <returns> ряд Фурье - результат дифференцирования </returns>
+        public FourierSeries GetDerivative()
+        {
+            double[] AA = new double[n + 1];
+            double[] BB = new double[n + 1];
+            double step = Math.PI / l;
+            for (int i = 1; i < n + 1; i++)
+            {
+                double c = i * step;
+                AA[i] = B[i] * c;
+                BB[i] = -A[i] * c;
+            }
+            return new FourierSeries(AA, BB, 2 * l, type);
+        }
+
+        /// <summary>
+        /// Почленное интегрирование ряда Фурье.
+        /// </summary>
+        /// <returns> ряд Фурье - результат интегрирования </returns>
+        public FourierSeries GetIntegral()
+        {
+            double[] AA = new double[n + 1];
+            double[] BB = new double[n + 1];
+            double step = Math.PI / l;
+            for (int i = 1; i < n + 1; i++)
+            {
+                double c = i * step;
+                AA[i] = -B[i] / c;
+                BB[i] = A[i] / c;
+            }
+            return new FourierSeries(AA, BB, 2 * l, type);
+        }
+
+        /// <summary>
+        /// Сложение рядов с одинаковым периодом.
+        /// </summary>
+        /// <param name="f1"> первый ряд </param>
+        /// <param name="f2"> второй ряд </param>
+        /// <returns> сумма рядов </returns>
+        public static FourierSeries operator +(FourierSeries f1, FourierSeries f2)
+        {
+            int n = Math.Max(f1.n, f2.n);
+            int m = Math.Min(f1.n, f2.n);
+            double[] A = new double[n + 1];
+            double[] B = new double[n + 1];
+            for (int i = 0; i <= m; i++)
+            {
+                A[i] += f1.A[i] + f2.A[i];
+                B[i] += f1.B[i] + f2.B[i];
+            }
+            for (int i = m + 1; i <= n; i++)
+            {
+                A[i] += f1.n > f2.n ? f1.A[i] : f2.A[i];
+                B[i] += f1.n > f2.n ? f1.B[i] : f2.B[i];
+            }
+            FourierSeriesType resType;
+            if (f1.type == FourierSeriesType.Sin && f2.type == FourierSeriesType.Sin)
+                resType = FourierSeriesType.Sin;
+            else if (f1.type == FourierSeriesType.Cos && f2.type == FourierSeriesType.Cos)
+                resType = FourierSeriesType.Cos;
+            else
+                resType = FourierSeriesType.CosSin;
+            return new FourierSeries(A, B, 2 * f1.l, resType);
+        }
+
+        /// <summary>
+        /// Вычитание рядов с одинаковым периодом.
+        /// </summary>
+        /// <param name="f1"> первый ряд </param>
+        /// <param name="f2"> второй ряд </param>
+        /// <returns> разность рядов </returns>
+        public static FourierSeries operator -(FourierSeries f1, FourierSeries f2)
+        {
+            int n = Math.Max(f1.n, f2.n);
+            int m = Math.Min(f1.n, f2.n);
+            double[] A = new double[n + 1];
+            double[] B = new double[n + 1];
+            for (int i = 0; i <= m; i++)
+            {
+                A[i] += f1.A[i] - f2.A[i];
+                B[i] += f1.B[i] - f2.B[i];
+            }
+            for (int i = m + 1; i <= n; i++)
+            {
+                A[i] += f1.n > f2.n ? f1.A[i] : -f2.A[i];
+                B[i] += f1.n > f2.n ? f1.B[i] : -f2.B[i];
+            }
+            FourierSeriesType resType;
+            if (f1.type == FourierSeriesType.Sin && f2.type == FourierSeriesType.Sin)
+                resType = FourierSeriesType.Sin;
+            else if (f1.type == FourierSeriesType.Cos && f2.type == FourierSeriesType.Cos)
+                resType = FourierSeriesType.Cos;
+            else
+                resType = FourierSeriesType.CosSin;
+            return new FourierSeries(A, B, 2 * f1.l, resType);
+        }
+
+        /// <summary>
+        /// Переопределение унарного оператора "+".
+        /// </summary>
+        /// <param name="f1"> ряд Фурье </param>
+        /// <returns> результат применения оператора </returns>
+        public static FourierSeries operator +(FourierSeries fs)
+        {
+            return fs;
+        }
+
+        /// <summary>
+        /// Переопределение унарного оператора "-".
+        /// </summary>
+        /// <param name="f1"> ряд Фурье </param>
+        /// <returns> результат применения оператора </returns>
+        public static FourierSeries operator -(FourierSeries fs)
+        {
+            int n = fs.n;
+            double[] A = new double[n + 1];
+            double[] B = new double[n + 1];
+            for (int i = 0; i <= n; i++)
+            {
+                A[i] = -fs.A[i];
+                B[i] = -fs.B[i];
+            }
+            return new FourierSeries(A, B, 2 * fs.l, fs.type);
+        }
     }
 }

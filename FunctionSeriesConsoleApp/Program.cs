@@ -16,7 +16,7 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 //bool test2 = Interpreter.IsVarInPolExpression(test);
 //Console.WriteLine(test2);
 
-//Console.WriteLine(new FourierApprox(new List<(double x, double y)>() {(1,1),(2,2)},2).Compute(1.5));
+Console.WriteLine(new FourierApprox(new List<(double x, double y)>() { (12, 11), (8, 11) }, FourierApprox.transform_type.fast));
 
 
 //Expr x = Expr.Variable("x");
@@ -46,11 +46,12 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 
 //Console.WriteLine(TaylorSeries("x^2+2", 2));
 
-TaylorSeries test = new TaylorSeries("sin(x)", 0, 5);
-TaylorSeries test2 = new TaylorSeries("cos(x)", 0, 5);
-Console.WriteLine(test);
-Console.WriteLine(test2);
-Console.WriteLine(-test2);
+
+//TaylorSeries test = new TaylorSeries("sin(x)", 0, 5);
+//TaylorSeries test2 = new TaylorSeries("cos(x)", 0, 5);
+//Console.WriteLine(test);
+//Console.WriteLine(test2);
+//Console.WriteLine(-test2);
 //Console.WriteLine(test.GetIntegral());
 //Console.WriteLine(test.GetIntegral().GetIntegral());
 //Console.WriteLine(test.GetIntegral().GetIntegral().Compute(2));

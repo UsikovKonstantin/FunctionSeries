@@ -109,32 +109,31 @@ namespace FunctionSeriesClassLibrary {
         }
 
         /// <summary>
-        /// Найти первый коэфициент ряда
+        /// Проверка на равность рядов Тейлора
         /// </summary>
-        /// <returns></returns>
-        public double FindFirst() {
-            string pol = Interpreter.GetPolishExpression(function);
-            double res = Interpreter.SolvePolishExpression(pol, new Dictionary<char, double>() { { 'x', x0 } });
-            return res;
+        /// <param name="t1">ряд Тейлора 1</param>
+        /// <param name="t2">ряд Тейлора 2</param>
+        /// <returns>Ряды тейлора равны - True, иначе - False</returns>
+        public static bool operator ==(TaylorSeries t1, TaylorSeries t2) {
+            if (t1.N != t2.N) return false;
+            for (int i = 0; i < t1.Coefs.Length; i++) {
+                if (t1.Coefs[i] != t2.Coefs[i]) return false;
+            }
+            return true;
         }
 
         /// <summary>
-        /// Найти все коэфициенты ряда
+        /// Проверка на не равность рядов Тейлора
         /// </summary>
-        public void FindCoefs() {
-            coefs[0] = FindFirst();
-
-            Expr x = Expr.Variable("x");
-            Expr prevDerivative = new Expr(Infix.Parse(function).ResultValue);
-            for (int i = 1; i < n + 1; i++) {
-                Expr derivative = prevDerivative.Differentiate(x);
-                string pol = Interpreter.GetPolishExpression(derivative.ToString());
-                coefs[i] = Interpreter.SolvePolishExpression(pol, new Dictionary<char, double>() { { 'x', x0 } });
-                double factorial = 1;
-                for (int j = 2; j <= i; j++) factorial *= j;
-                coefs[i] /= factorial;
-                prevDerivative = derivative;
+        /// <param name="t1">ряд Тейлора 1</param>
+        /// <param name="t2">ряд Тейлора 2</param>
+        /// <returns>Ряды тейлора не равны - True, иначе - False</returns>
+        public static bool operator !=(TaylorSeries t1, TaylorSeries t2) {
+            if (t1.N != t2.N) return true;
+            for (int i = 0; i < t1.Coefs.Length; i++) {
+                if (t1.Coefs[i] != t2.Coefs[i]) return true;
             }
+            return false;
         }
 
         /// <summary>
@@ -211,6 +210,49 @@ namespace FunctionSeriesClassLibrary {
             }
 
             return res;
+        }
+
+        // <summary>
+        /// Проверка на равность рядов Тейлора
+        /// </summary>
+        /// <param name="t1">ряд Тейлора 1</param>
+        /// <param name="t2">ряд Тейлора 2</param>
+        /// <returns>Ряды тейлора равны - True, иначе - False</returns>
+        public bool Equals(TaylorSeries t1, TaylorSeries t2) {
+            if (t1.N != t2.N) return false;
+            for (int i = 0; i < t1.Coefs.Length; i++) {
+                if (t1.Coefs[i] != t2.Coefs[i]) return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Найти первый коэфициент ряда
+        /// </summary>
+        /// <returns></returns>
+        private double FindFirst() {
+            string pol = Interpreter.GetPolishExpression(function);
+            double res = Interpreter.SolvePolishExpression(pol, new Dictionary<char, double>() { { 'x', x0 } });
+            return res;
+        }
+
+        /// <summary>
+        /// Найти все коэфициенты ряда
+        /// </summary>
+        private void FindCoefs() {
+            coefs[0] = FindFirst();
+
+            Expr x = Expr.Variable("x");
+            Expr prevDerivative = new Expr(Infix.Parse(function).ResultValue);
+            for (int i = 1; i < n + 1; i++) {
+                Expr derivative = prevDerivative.Differentiate(x);
+                string pol = Interpreter.GetPolishExpression(derivative.ToString());
+                coefs[i] = Interpreter.SolvePolishExpression(pol, new Dictionary<char, double>() { { 'x', x0 } });
+                double factorial = 1;
+                for (int j = 2; j <= i; j++) factorial *= j;
+                coefs[i] /= factorial;
+                prevDerivative = derivative;
+            }
         }
     }
 }

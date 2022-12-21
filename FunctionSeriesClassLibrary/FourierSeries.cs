@@ -359,5 +359,83 @@ namespace FunctionSeriesClassLibrary
             }
             return new FourierSeries(A, B, 2 * fs.l, fs.type);
         }
+
+        /// <summary>
+        /// Переопределение оператора сравнения.
+        /// </summary>
+        /// <param name="f1"> первый ряд </param>
+        /// <param name="f2"> второй ряд </param>
+        /// <returns> true - если ряды равны, иначе - false </returns>
+        public static bool operator ==(FourierSeries f1, FourierSeries f2)
+        {
+            if (f1.n == f2.n && f1.l == f2.l && f1.type == f2.type &&
+                f1.a.SequenceEqual(f2.a) && f1.b.SequenceEqual(f2.b))
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Переопределение оператора сравнения.
+        /// </summary>
+        /// <param name="f1"> первый ряд </param>
+        /// <param name="f2"> второй ряд </param>
+        /// <returns> true - если ряды не равны, иначе - false </returns>
+        public static bool operator !=(FourierSeries f1, FourierSeries f2)
+        {
+            return !(f1 == f2);
+        }
+
+        /// <summary>
+        /// Переопределение метода Equals().
+        /// </summary>
+        /// <param name="obj"> объект для сравнения </param>
+        /// <returns> true - если объекты равны, иначе - false </returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj is FourierSeries fs)
+                return this == fs;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Переопределение метода GetHashCode().
+        /// </summary>
+        /// <returns> хэш-код </returns>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(n, l, a, b, type);
+        }
+
+        /// <summary>
+        /// Умножение ряда на число.
+        /// </summary>
+        /// <param name="k"> число </param>
+        /// <param name="fs"> ряд Фурье </param>
+        /// <returns> ряд Фурье - результат умножения </returns>
+        public static FourierSeries operator *(double k, FourierSeries fs)
+        {
+            int n = fs.n;
+            double[] A = new double[n + 1];
+            double[] B = new double[n + 1];
+            for (int i = 0; i <= n; i++)
+            {
+                A[i] = k * fs.A[i];
+                B[i] = k * fs.B[i];
+            }
+            return new FourierSeries(A, B, 2 * fs.l, fs.type);
+        }
+
+        /// <summary>
+        /// Умножение ряда на число.
+        /// </summary>
+        /// <param name="fs"> ряд Фурье </param>
+        /// <param name="k"> число </param>
+        /// <returns> ряд Фурье - результат умножения </returns>
+        public static FourierSeries operator *(FourierSeries fs, double k)
+        {
+            return k * fs;
+        }
     }
 }

@@ -115,6 +115,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="t2">ряд Тейлора 2</param>
         /// <returns>Ряды тейлора равны - True, иначе - False</returns>
         public static bool operator ==(TaylorSeries t1, TaylorSeries t2) {
+            if (t1.X0 != t2.X0) return false;
             if (t1.N != t2.N) return false;
             for (int i = 0; i < t1.Coefs.Length; i++) {
                 if (t1.Coefs[i] != t2.Coefs[i]) return false;
@@ -129,6 +130,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="t2">ряд Тейлора 2</param>
         /// <returns>Ряды тейлора не равны - True, иначе - False</returns>
         public static bool operator !=(TaylorSeries t1, TaylorSeries t2) {
+            if (t1.X0 != t2.X0) return true;
             if (t1.N != t2.N) return true;
             for (int i = 0; i < t1.Coefs.Length; i++) {
                 if (t1.Coefs[i] != t2.Coefs[i]) return true;
@@ -219,6 +221,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="t2">ряд Тейлора 2</param>
         /// <returns>Ряды тейлора равны - True, иначе - False</returns>
         public bool Equals(TaylorSeries t1, TaylorSeries t2) {
+            if (t1.X0 != t2.X0) return false;
             if (t1.N != t2.N) return false;
             for (int i = 0; i < t1.Coefs.Length; i++) {
                 if (t1.Coefs[i] != t2.Coefs[i]) return false;

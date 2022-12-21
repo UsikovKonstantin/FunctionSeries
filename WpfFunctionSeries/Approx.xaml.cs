@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using FunctionSeriesClassLibrary;
+using ScottPlot;
 
 namespace WpfFunctionSeries;
 
@@ -36,7 +37,7 @@ public partial class Approx : Window
     {
         if (!IsInitialized) return;
         if (point_cloud.Count == 0) return;
-        new Text_repr(Text_repr.Text_type.approx, fa: new FourierApprox(point_cloud, int.Parse(Tx_Terms_Input.Text), FourierApprox.transform_type.slow))
+        new Text_repr(Text_repr.Text_type.approx, fa: new FourierApprox(point_cloud, FourierApprox.transform_type.slow))
             .Show();
     }
 
@@ -108,13 +109,30 @@ public partial class Approx : Window
         W_Plot.Plot.Clear();
         foreach (var point in point_cloud) W_Plot.Plot.AddPoint(point.x, point.y, Color.Blue);
         W_Plot.Plot.SetAxisLimits(cur_lim);
-        if (point_cloud.Count != 0)
+        if (point_cloud.Count > 0)
         {
-            var precision = int.Parse(Tx_Terms_Input.Text);
-            FourierApprox fs = new(point_cloud, precision, FourierApprox.transform_type.slow);
-            W_Plot.Plot.AddFunction(x => fs.Compute(x), Color.Orange);
+            var precision = Math.Min(int.Parse(Tx_Terms_Input.Text),point_cloud.Count);
+            FourierApprox fs = new(point_cloud, FourierApprox.transform_type.fast);
+            var t1 = W_Plot.Plot.AddFunction(x => fs.Compute(x, precision), Color.Orange);
+            t1.Label = "Быстрое преобразование";
+            FourierApprox ff = new(point_cloud, FourierApprox.transform_type.slow);
+            var t2 = W_Plot.Plot.AddFunction(x => ff.Compute(x, precision), Color.Orange);
+            t2.Label = "Стандартное преобразование";
+            var l = W_Plot.Plot.Legend();
+            if (point_cloud.Count >= 33)
+            {
+                l.IsVisible = true;
+                t2.LineStyle = LineStyle.Dash;
+                t2.Color = Color.Red;
+            }
+            else
+            {
+                l.IsVisible = false;
+                t2.LineStyle = LineStyle.Solid;
+                t2.Color = Color.Orange;
+            }
         }
-
+        
         W_Plot.Refresh();
     }
 }

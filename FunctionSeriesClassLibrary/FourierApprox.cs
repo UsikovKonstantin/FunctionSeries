@@ -9,10 +9,10 @@ namespace FunctionSeriesClassLibrary;
 /// </summary>
 public class FourierApprox
 {
-    internal List<(double x, double y)> Point_cloud; //Поле точек для аппроксимации
+    private List<(double x, double y)> Point_cloud; //Поле точек для аппроксимации
     internal List<Complex> Frequencies = new(); // Частоты
-    internal int num_points = 0; // Количество точек в аппроксимации
-    internal double period = 0.0; // Период ряда 
+    private int num_points = 0; // Количество точек в аппроксимации
+    private double period = 0.0; // Период ряда 
     public enum transform_type
     {
         slow,
@@ -22,7 +22,6 @@ public class FourierApprox
     /// Получение ряда Фурье посредством поля точек (Тип 2)
     /// </summary>
     /// <param name="point_cloud">Поле точек</param>
-    /// /// <param name="precision">Сколько нужно частот</param>
     public FourierApprox(List<(double x, double y)> point_cloud, transform_type type )
     {
         num_points = point_cloud.Count;
@@ -44,19 +43,7 @@ public class FourierApprox
                     var clouds = split_cloud(); 
                     var even = new FourierApprox(clouds.point_cloud_even, transform_type.fast);
                     var odd = new FourierApprox(clouds.point_cloud_odd, transform_type.fast);
-                    Complex Dk = -Complex.ImaginaryOne * (2 * Math.PI / period) / num_points;
-                    for (int i = 0; i < num_points/2; i++)
-                    {
-                        Complex Factor = Complex.Pow(new(Math.E, 0),
-                            Dk * i);
-                        Frequencies.Add(even.Frequencies[i] + (odd.Frequencies[i] * Factor));
-                    }
-                    for (int i = num_points/2; i < num_points; i++)
-                    {
-                        Complex Factor = Complex.Pow(new(Math.E, 0),
-                            Dk * i);
-                        Frequencies.Add(even.Frequencies[i-(num_points/2)] + (odd.Frequencies[Math.Min(i-(num_points/2),odd.num_points-1)] * Factor));
-                    }
+                    NUFFT_Coefficients(even, odd);
                 }
                 
                 break;
@@ -65,6 +52,30 @@ public class FourierApprox
         }
         
     }
+    /// <summary>
+    /// Поиск коэффициентов посредством Быстрого преобразования
+    /// </summary>
+    /// <param name="even">Поле четных точек</param>
+    /// <param name="odd">Поле нечетных точек</param>
+    private void NUFFT_Coefficients(FourierApprox even, FourierApprox odd)
+    {
+        Complex Dk = -Complex.ImaginaryOne * (2 * Math.PI / period) / num_points;
+        for (int i = 0; i < num_points / 2; i++)
+        {
+            Complex Factor = Complex.Pow(new(Math.E, 0),
+                Dk * i);
+            Frequencies.Add(even.Frequencies[i] + (odd.Frequencies[i] * Factor));
+        }
+
+        for (int i = num_points / 2; i < num_points; i++)
+        {
+            Complex Factor = Complex.Pow(new(Math.E, 0),
+                Dk * i);
+            Frequencies.Add(even.Frequencies[i - (num_points / 2)] +
+                            (odd.Frequencies[Math.Min(i - (num_points / 2), odd.num_points - 1)] * Factor));
+        }
+    }
+
     /// <summary>
     /// Период ряда по полю точек
     /// </summary>
@@ -85,7 +96,10 @@ public class FourierApprox
             Frequencies.Add(Get_Specific(i,Dk));
         }
     }
-
+    /// <summary>
+    /// Разделяет поле точек на 2 разных поля
+    /// </summary>
+    /// <returns>Поле с четными и поле с нечетными точками</returns>
     private (List<(double x, double y)> point_cloud_even, List<(double x, double y)> point_cloud_odd) split_cloud()
     {
         List<(double x, double y)> point_cloud_even = new();
@@ -125,14 +139,18 @@ public class FourierApprox
     /// Вычисление значения в точке посредством инверсного преобразования
     /// </summary>
     /// <param name="x">Координата для вычисления</param>
+    /// <param name="precision">Сколько нужно частот</param>
     /// <returns>Значение при координате</returns>
     public double Compute(double x, int Precision)
     {
         Complex result = 0;
         Complex Dk = Complex.ImaginaryOne * (2 * Math.PI / period);
-        for (int i = 0; i < Precision; i++)
+        result += Frequencies[0] * Complex.Pow(new(Math.E, 0), 0);
+        for (int i = 1; i < Precision; i++)
         {
             result += Frequencies[i] * Complex.Pow(new(Math.E, 0), Dk * i * x);
+            Complex t = new (Frequencies[i].Real, -Frequencies[i].Imaginary);
+            result += t * Complex.Pow(new(Math.E, 0), Dk * -i * x);
         }
 
         result /= num_points;

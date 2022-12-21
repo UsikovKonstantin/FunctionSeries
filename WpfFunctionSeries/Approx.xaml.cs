@@ -109,7 +109,7 @@ public partial class Approx : Window
         W_Plot.Plot.Clear();
         foreach (var point in point_cloud) W_Plot.Plot.AddPoint(point.x, point.y, Color.Blue);
         W_Plot.Plot.SetAxisLimits(cur_lim);
-        if (point_cloud.Count > 0)
+        if (point_cloud.Count > 1)
         {
             var precision = Math.Min(int.Parse(Tx_Terms_Input.Text),point_cloud.Count);
             FourierApprox fs = new(point_cloud, FourierApprox.transform_type.fast);

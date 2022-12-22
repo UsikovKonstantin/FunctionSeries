@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using FunctionSeriesClassLibrary;
 
 namespace WpfFunctionSeries;
@@ -59,7 +63,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void General_Calc(object sender, RoutedEventArgs e)
+    private async void General_Calc(object sender, RoutedEventArgs e)
     {
         if (!IsInitialized) return;
         Set_Up_UI();
@@ -90,9 +94,43 @@ public partial class MainWindow : Window
         {
             checks_terms_taylor();
             checks_x0();
-            TaylorSeries ts = new(Tx_Fun_Input.Text, double.Parse(Tx_Per_Input.Text),
-                int.Parse(Tx_Tay_Terms_Input.Text));
-            Update_Plot(ts);
+            var cts = new CancellationTokenSource();
+            var ts = Task.Run(() =>
+            {
+                var ds = this.Dispatcher;
+                string fun_text = null;
+                ds.Invoke(() => fun_text = Tx_Fun_Input.Text);
+                double x0 = 0;
+                ds.Invoke(() => x0 = double.Parse(Tx_Per_Input.Text));
+                int n = 5;
+                ds.Invoke(() => n = int.Parse(Tx_Tay_Terms_Input.Text));
+                return new TaylorSeries(fun_text, x0, n, ct:cts.Token);
+            },cts.Token);
+            Stopwatch sw = Stopwatch.StartNew();
+            bool success = false;
+            while (sw.ElapsedMilliseconds < 100)
+            {
+                if (ts.IsCompleted)
+                {
+                    success = true;
+                    break;
+                }
+                await Task.Delay(10);
+            }
+            if (success)
+            {
+                Scr_Tay_Terms.Background = Brushes.White;
+                Scr_Tay_Terms.ToolTip = "";
+                Update_Plot(ts.Result);    
+            }
+            else
+            {
+                cts.Cancel();
+                Scr_Tay_Terms.Background = Brushes.Red;
+                Scr_Tay_Terms.ToolTip = "Слишком высокая степень";
+                await ts;
+                ts.Dispose();
+            }
         }
     }
 

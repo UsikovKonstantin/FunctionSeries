@@ -8,7 +8,7 @@ namespace FunctionSeriesClassLibrary {
         /// </summary>
         /// <param name="input">фунция в строчном виде</param>
         /// <returns>польская запись</returns>
-        public static string GetPolishExpression(string input) {
+        public static string GetPolishExpression(string input, CancellationToken ct = new()) {
             input = input.Trim();
             string output = "";
             Stack<string> operStack = new Stack<string>();
@@ -17,7 +17,7 @@ namespace FunctionSeriesClassLibrary {
             bool isPrevElOper = true;
             for (int i = 0; i < input.Length; i++) {
                 if (IsDelimeter(input[i])) continue;
-
+                if (ct.IsCancellationRequested) return "Failure";
                 if (IsOperator(input[i])) HandleOperator(input[i], operStack, ref output, ref isPrevElOper, ref holdMinus);
                 else if (IsFunction(i, input)) HandleFunction(input, ref i, operStack, ref isPrevElOper, ref holdMinus);
                 else if (IsValue(input[i])) HandleValue(input, ref i, ref output, ref isPrevElOper, ref holdMinus);

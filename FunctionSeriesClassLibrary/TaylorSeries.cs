@@ -38,7 +38,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="n">кол-во коэффициентов в ряде</param>
         /// <param name="computeCoefs">вычислять ли коэффициенты сразу же при создания объекта</param>
         /// <exception cref="Exception">если кол-во коэффициентов в ряду меньше нуля</exception>
-        public TaylorSeries(string function, double x0, int n, bool computeCoefs = true) {
+        public TaylorSeries(string function, double x0, int n, bool computeCoefs = true, CancellationToken ct = new()) {
             if (n < 0) throw new Exception("Кол-во коэффициентов в ряду должно быть больше нуля");
             this.function = function;
             this.x0 = x0;
@@ -242,14 +242,14 @@ namespace FunctionSeriesClassLibrary {
         /// <summary>
         /// Найти все коэфициенты ряда
         /// </summary>
-        private void FindCoefs() {
+        private void FindCoefs(CancellationToken ct = new()) {
             coefs[0] = FindFirst();
 
             Expr x = Expr.Variable("x");
             Expr prevDerivative = new Expr(Infix.Parse(function).ResultValue);
             for (int i = 1; i < n + 1; i++) {
                 Expr derivative = prevDerivative.Differentiate(x);
-                string pol = Interpreter.GetPolishExpression(derivative.ToString());
+                string pol = Interpreter.GetPolishExpression(derivative.ToString(),ct:ct);
                 coefs[i] = Interpreter.SolvePolishExpression(pol, new Dictionary<char, double>() { { 'x', x0 } });
                 double factorial = 1;
                 for (int j = 2; j <= i; j++) factorial *= j;

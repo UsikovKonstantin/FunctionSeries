@@ -250,6 +250,7 @@ namespace FunctionSeriesClassLibrary {
             for (int i = 1; i < n + 1; i++) {
                 Expr derivative = prevDerivative.Differentiate(x);
                 string pol = Interpreter.GetPolishExpression(derivative.ToString(),ct:ct);
+                if (ct.IsCancellationRequested)return;
                 coefs[i] = Interpreter.SolvePolishExpression(pol, new Dictionary<char, double>() { { 'x', x0 } });
                 double factorial = 1;
                 for (int j = 2; j <= i; j++) factorial *= j;

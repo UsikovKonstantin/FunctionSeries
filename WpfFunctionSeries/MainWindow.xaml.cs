@@ -108,7 +108,7 @@ public partial class MainWindow : Window
             },cts.Token);
             Stopwatch sw = Stopwatch.StartNew();
             bool success = false;
-            while (sw.ElapsedMilliseconds < 100)
+            while (sw.ElapsedMilliseconds < 1000)
             {
                 if (ts.IsCompleted)
                 {
@@ -128,8 +128,6 @@ public partial class MainWindow : Window
                 cts.Cancel();
                 Scr_Tay_Terms.Background = Brushes.Red;
                 Scr_Tay_Terms.ToolTip = "Слишком высокая степень";
-                await ts;
-                ts.Dispose();
             }
         }
     }

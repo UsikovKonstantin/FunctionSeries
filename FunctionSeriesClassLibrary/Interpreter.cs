@@ -17,10 +17,10 @@ namespace FunctionSeriesClassLibrary {
             bool isPrevElOper = true;
             for (int i = 0; i < input.Length; i++) {
                 if (IsDelimeter(input[i])) continue;
-                if (ct.IsCancellationRequested) return "Failure";
-                if (IsOperator(input[i])) HandleOperator(input[i], operStack, ref output, ref isPrevElOper, ref holdMinus);
+                if (ct.IsCancellationRequested) return "x";
+                if (IsOperator(input[i])) HandleOperator(input[i], operStack, ref output, ref isPrevElOper, ref holdMinus, ct:ct);
                 else if (IsFunction(i, input)) HandleFunction(input, ref i, operStack, ref isPrevElOper, ref holdMinus);
-                else if (IsValue(input[i])) HandleValue(input, ref i, ref output, ref isPrevElOper, ref holdMinus);
+                else if (IsValue(input[i])) HandleValue(input, ref i, ref output, ref isPrevElOper, ref holdMinus, ct:ct);
             }
 
             // Когда прошли по всем символам, выкидываем из стека все оставшиеся там операции в строку
@@ -112,7 +112,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="output">результат - польская запись</param>
         /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
         /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
-        private static void HandleOperator(char oper, Stack<string> operStack, ref string output, ref bool isPrevElOper, ref bool holdMinus) {
+        private static void HandleOperator(char oper, Stack<string> operStack, ref string output, ref bool isPrevElOper, ref bool holdMinus, CancellationToken ct = new()) {
             if (oper == '(') {
                 operStack.Push((holdMinus ? "-" : "") + oper.ToString());
                 holdMinus = false;
@@ -121,6 +121,7 @@ namespace FunctionSeriesClassLibrary {
                 string s = operStack.Pop();
 
                 while (s != "(" && s != "-(") {
+                    if (ct.IsCancellationRequested) return;
                     output += s.ToString() + ' ';
                     s = operStack.Pop();
                 }
@@ -178,7 +179,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="output">результат - польская запись</param>
         /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
         /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
-        private static void HandleValue(string input, ref int i, ref string output, ref bool isPrevElOper, ref bool holdMinus) {
+        private static void HandleValue(string input, ref int i, ref string output, ref bool isPrevElOper, ref bool holdMinus, CancellationToken ct = new()) {
             if (holdMinus) {
                 output += "-";
                 holdMinus = false;
@@ -187,7 +188,7 @@ namespace FunctionSeriesClassLibrary {
             while (!IsDelimeter(input[i]) && !IsOperator(input[i])) {
                 output += input[i];
                 i++;
-
+                if (ct.IsCancellationRequested) return;
                 // Если символ - последний, то выходим из цикла
                 if (i == input.Length) break;
             }

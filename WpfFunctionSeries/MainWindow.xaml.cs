@@ -232,7 +232,15 @@ public partial class MainWindow : Window
         var pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
         W_Plot.Plot.AddFunction(
             x => Interpreter.SolvePolishExpression(pol, new Dictionary<char, double> { { 'x', x } }));
-        W_Plot.Plot.AddFunction(x => fs.Compute(x));
+        var t = cloud_at_range(fs);
+        List<double> xs = new(), ys = new();
+        for (int i = 0; i < t.Count; i++)
+        {
+            xs.Add(t[i].x);
+            ys.Add(t[i].y);
+        }
+
+        W_Plot.Plot.AddScatter(xs.ToArray(), ys.ToArray(),markerShape:ScottPlot.MarkerShape.none);
         // постановка более удобных границ графика
         double max_x = 5;
         var step = max_x * 2 / 1000;
@@ -254,6 +262,20 @@ public partial class MainWindow : Window
         W_Plot.Refresh();
     }
 
+    private List<(double x, double y)> cloud_at_range(TaylorSeries ts)
+    {
+        List<(double x, double y)> cloud = new();
+        double min_x = W_Plot.Plot.GetAxisLimits().XMin, max_x = W_Plot.Plot.GetAxisLimits().XMax;
+        double min_y = W_Plot.Plot.GetAxisLimits().YMin - 1, max_y = W_Plot.Plot.GetAxisLimits().YMax + 1;
+        double step = (max_x - min_x) / 1000;
+        for (var i = min_x; i <= max_x; i+= step)
+        {
+            var val = ts.Compute(i);
+            val = Math.Min(Math.Max(min_y, val), max_y);
+            cloud.Add((i, val));
+        }
+        return cloud;
+    }
     private double call_fun(double x, string polish)
     {
         // Вызывает функцию таким образом, как если бы она была периодической

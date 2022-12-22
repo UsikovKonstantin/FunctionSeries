@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace FunctionSeriesClassLibrary {
     public static class Interpreter {
@@ -113,6 +114,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
         /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
         private static void HandleOperator(char oper, Stack<string> operStack, ref string output, ref bool isPrevElOper, ref bool holdMinus, CancellationToken ct = new()) {
+            StringBuilder sb = new StringBuilder();
             if (oper == '(') {
                 operStack.Push((holdMinus ? "-" : "") + oper.ToString());
                 holdMinus = false;
@@ -122,14 +124,18 @@ namespace FunctionSeriesClassLibrary {
 
                 while (s != "(" && s != "-(") {
                     if (ct.IsCancellationRequested) return;
-                    output += s.ToString() + ' ';
+                    sb.Append(s.ToString());
+                    sb.Append(' ');
                     s = operStack.Pop();
                 }
                 if (s == "-(") operStack.Push("_");
             } else {
                 if (!isPrevElOper) {
                     while (operStack.Count > 0 && GetPriority(oper.ToString()) <= GetPriority(operStack.Peek().ToString()))
-                        output += operStack.Pop().ToString() + " ";
+                    {
+                        sb.Append(operStack.Pop().ToString());
+                        sb.Append(' ');
+                    }
                 }
 
                 if (oper == '-' && isPrevElOper) holdMinus = true;
@@ -137,6 +143,7 @@ namespace FunctionSeriesClassLibrary {
 
             }
             if (oper != ')' && oper != '!') isPrevElOper = true;
+            output += sb.ToString();
         }
 
         /// <summary>
@@ -180,20 +187,22 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
         /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
         private static void HandleValue(string input, ref int i, ref string output, ref bool isPrevElOper, ref bool holdMinus, CancellationToken ct = new()) {
+            StringBuilder sb = new StringBuilder();
             if (holdMinus) {
-                output += "-";
+                sb.Append('-');
                 holdMinus = false;
             }
             // Читаем до разделителя или оператора, чтобы получить число
             while (!IsDelimeter(input[i]) && !IsOperator(input[i])) {
-                output += input[i];
+                sb.Append(input[i]);
                 i++;
                 if (ct.IsCancellationRequested) return;
                 // Если символ - последний, то выходим из цикла
                 if (i == input.Length) break;
             }
 
-            output += ' ';
+            sb.Append(' ');
+            output += sb.ToString();
             i--;
             isPrevElOper = false;
         }

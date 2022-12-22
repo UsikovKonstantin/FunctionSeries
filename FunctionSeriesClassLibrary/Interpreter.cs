@@ -114,6 +114,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
         /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
         private static void HandleOperator(char oper, Stack<string> operStack, ref string output, ref bool isPrevElOper, ref bool holdMinus, CancellationToken ct = new()) {
+            if (ct.IsCancellationRequested) return;
             StringBuilder sb = new StringBuilder();
             if (oper == '(') {
                 operStack.Push((holdMinus ? "-" : "") + oper.ToString());
@@ -187,6 +188,7 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="isPrevElOper">показывает если предыдущий элемент оператор, необходимо для работы с минусами</param>
         /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
         private static void HandleValue(string input, ref int i, ref string output, ref bool isPrevElOper, ref bool holdMinus, CancellationToken ct = new()) {
+            if (ct.IsCancellationRequested) return;
             StringBuilder sb = new StringBuilder();
             if (holdMinus) {
                 sb.Append('-');

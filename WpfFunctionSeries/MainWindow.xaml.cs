@@ -228,7 +228,9 @@ public partial class MainWindow : Window
     private void Update_Plot(TaylorSeries fs)
     {
         // Работа с графиком
+        var lim = W_Plot.Plot.GetAxisLimits();
         W_Plot.Plot.Clear();
+        if (!taylor_empty && Tx_Fun_Input.Text == taylor_saved.Function) W_Plot.Plot.SetAxisLimits(lim);
         var pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
         W_Plot.Plot.AddFunction(
             x => Interpreter.SolvePolishExpression(pol, new Dictionary<char, double> { { 'x', x } }));
@@ -259,8 +261,10 @@ public partial class MainWindow : Window
         }
 
         W_Plot.Plot.AddScatter(xs.ToArray(), ys.ToArray(),markerShape:ScottPlot.MarkerShape.none);
+        if (!taylor_empty && Tx_Fun_Input.Text == taylor_saved.Function) W_Plot.Plot.SetAxisLimits(lim);
         taylor_saved = fs;
         taylor_empty = false;
+        W_Plot_OnAxesChanged(new(),new());
         W_Plot.Refresh();
     }
 
@@ -270,16 +274,22 @@ public partial class MainWindow : Window
         double min_x = W_Plot.Plot.GetAxisLimits().XMin, max_x = W_Plot.Plot.GetAxisLimits().XMax;
         double aver = (min_x + max_x) / 2;
         double diff = Math.Abs(aver - min_x);
-        min_x = aver - (diff * 1.2); max_x = aver + (diff*1.2);
+        double multiplier = 1.3;
+        min_x = aver - (diff * multiplier); max_x = aver + (diff * multiplier);
         double min_y = W_Plot.Plot.GetAxisLimits().YMin - 1, max_y = W_Plot.Plot.GetAxisLimits().YMax + 1;
         aver = (min_y + max_y) / 2;
         diff = Math.Abs(aver - min_y);
-        min_y = aver - (diff * 1.2); max_y = aver + (diff*1.2);
+        min_y = aver - (diff * multiplier); max_y = aver + (diff * multiplier);
         double step = (max_x - min_x) / 1000;
         for (var i = min_x; i <= max_x; i+= step)
         {
             var val = ts.Compute(i);
             val = Math.Min(Math.Max(min_y, val), max_y);
+            if (double.IsNaN(val))
+            {
+                if (ts.N % 2 == 0) val = max_y;
+                else val = min_y;
+            }
             cloud.Add((i, val));
         }
         return cloud;

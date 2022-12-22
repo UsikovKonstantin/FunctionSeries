@@ -426,22 +426,18 @@ public partial class MainWindow : Window
         if (Rb_Fourier.IsChecked.Value)
         {
             if (Rb_Sin.IsChecked.Value)
-                new Text_repr(Text_repr.Text_type.function,
-                    new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
+                new Text_repr(new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
                         Tx_Fun_Input.Text, FourierSeriesType.Sin)).Show();
             if (Rb_Cos.IsChecked.Value)
-                new Text_repr(Text_repr.Text_type.function,
-                    new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
+                new Text_repr(new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
                         Tx_Fun_Input.Text, FourierSeriesType.Cos)).Show();
             if (Rb_Asym.IsChecked.Value)
-                new Text_repr(Text_repr.Text_type.function,
-                    new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
+                new Text_repr(new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
                         Tx_Fun_Input.Text, FourierSeriesType.CosSin)).Show();
         }
         else if (Rb_Taylor.IsChecked.Value)
         {
-            new Text_repr(Text_repr.Text_type.taylor,
-                    ts: new TaylorSeries(Tx_Fun_Input.Text, double.Parse(Tx_Per_Input.Text),
+            new Text_repr(ts: new TaylorSeries(Tx_Fun_Input.Text, double.Parse(Tx_Per_Input.Text),
                         int.Parse(Tx_Tay_Terms_Input.Text)))
                 .Show();
         }

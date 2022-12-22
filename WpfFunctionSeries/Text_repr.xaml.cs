@@ -6,29 +6,27 @@ namespace WpfFunctionSeries;
 
 public partial class Text_repr : Window
 {
-    public enum Text_type
-    {
-        function,
-        approx,
-        taylor
-    }
-
-    public Text_repr(Text_type type, FourierSeries fs = null, FourierApprox fa = null, TaylorSeries ts = null)
+    public Text_repr( FourierApprox fa)
     {
         InitializeComponent();
-        switch (type)
+        Block.Text = $"Частоты:{fa}";
+    }
+    public Text_repr( FourierSeries fs)
+    {
+        InitializeComponent();
+        Block.Text = $"{fs}";
+    }
+    public Text_repr( TaylorSeries ts)
+    {
+        InitializeComponent();
+        Block.Text = $"{ts}";
+    }
+
+    private void Text_repr_OnClosed(object? sender, EventArgs e)
+    {
+        if (Approx.window_count != 0)
         {
-            case Text_type.function:
-                Block.Text = $"{fs}";
-                break;
-            case Text_type.approx:
-                Block.Text = $"Частоты:{fa}";
-                break;
-            case Text_type.taylor:
-                Block.Text = $"{ts}";
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            Approx.window_count -= 1;
         }
     }
 }

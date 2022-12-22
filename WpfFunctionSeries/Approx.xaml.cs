@@ -37,7 +37,8 @@ public partial class Approx : Window
     {
         if (!IsInitialized) return;
         if (point_cloud.Count == 0) return;
-        new Text_repr(Text_repr.Text_type.approx, fa: new FourierApprox(point_cloud, FourierApprox.transform_type.slow))
+        window_count += 1;
+        new Text_repr(new FourierApprox(point_cloud, FourierApprox.transform_type.fast))
             .Show();
     }
 
@@ -63,10 +64,14 @@ public partial class Approx : Window
         Calculate();
     }
 
+    public static int window_count = 0;
     private void W_Plot_OnMouseEnter(object sender, MouseEventArgs e)
     {
         W_Plot.Focusable = true;
-        W_Plot.Focus();
+        if (window_count == 0)
+        {
+            W_Plot.Focus();    
+        }
     }
 
     private void W_Plot_OnKeyDown(object sender, KeyEventArgs e)

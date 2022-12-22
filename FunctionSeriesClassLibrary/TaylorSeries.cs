@@ -130,12 +130,31 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="t2">ряд Тейлора 2</param>
         /// <returns>Ряды тейлора не равны - True, иначе - False</returns>
         public static bool operator !=(TaylorSeries t1, TaylorSeries t2) {
-            if (t1.X0 != t2.X0) return true;
-            if (t1.N != t2.N) return true;
-            for (int i = 0; i < t1.Coefs.Length; i++) {
-                if (t1.Coefs[i] != t2.Coefs[i]) return true;
-            }
-            return false;
+            return !(t1 == t2);
+        }
+
+        /// <summary>
+        /// Умножение ряда на число
+        /// </summary>
+        /// <param name="ts">ряд Тейлора</param>
+        /// <param name="k">число</param>
+        /// <returns>результат умножения</returns>
+        public static TaylorSeries operator *(TaylorSeries ts, double k) {
+            double[] coefs = new double[ts.N + 1];
+            for (int i = 0; i < ts.Coefs.Length; i++) coefs[i] = ts.Coefs[i] * k;
+            TaylorSeries res = new TaylorSeries(ts.Function, ts.X0, ts.N, false);
+            res.coefs = coefs;
+            return res;
+        }
+
+        /// <summary>
+        /// Умножение ряда на число
+        /// </summary>
+        /// <param name="k">число</param>
+        /// <param name="ts">ряд Тейлора</param>
+        /// <returns>результат умножения</returns>
+        public static TaylorSeries operator *(double k, TaylorSeries ts) {
+            return ts * k;
         }
 
         /// <summary>
@@ -148,7 +167,7 @@ namespace FunctionSeriesClassLibrary {
                 newCoefs[i - 1] = coefs[i] * i;
             }
             TaylorSeries newTaylorSeries;
-            if (n != 0) newTaylorSeries = new TaylorSeries($"d({function})/dx", x0, n - 1, false);
+            if (n != 0) newTaylorSeries = new TaylorSeries($"d({function})/dx", x0, n, false);
             else newTaylorSeries = new TaylorSeries($"d({function})/dx", x0, n, false);
             newTaylorSeries.coefs = newCoefs;
             return newTaylorSeries;
@@ -163,7 +182,7 @@ namespace FunctionSeriesClassLibrary {
             for (int i = 0; i < n + 1; i++) {
                 newCoefs[i + 1] = coefs[i] / (i + 1);
             }
-            TaylorSeries newTaylorSeries = new TaylorSeries($"∫({function})dx", x0, n + 1, false);
+            TaylorSeries newTaylorSeries = new TaylorSeries($"∫({function})dx", x0, n, false);
             newTaylorSeries.coefs = newCoefs;
             return newTaylorSeries;
         }
@@ -220,13 +239,19 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="t1">ряд Тейлора 1</param>
         /// <param name="t2">ряд Тейлора 2</param>
         /// <returns>Ряды тейлора равны - True, иначе - False</returns>
-        public bool Equals(TaylorSeries t1, TaylorSeries t2) {
-            if (t1.X0 != t2.X0) return false;
-            if (t1.N != t2.N) return false;
-            for (int i = 0; i < t1.Coefs.Length; i++) {
-                if (t1.Coefs[i] != t2.Coefs[i]) return false;
-            }
-            return true;
+        public override bool Equals(object? obj) {
+            if (obj is TaylorSeries fs)
+                return this == fs;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Переопределение метода GetHashCode().
+        /// </summary>
+        /// <returns> хэш-код </returns>
+        public override int GetHashCode() {
+            return HashCode.Combine(x0, coefs, n);
         }
 
         /// <summary>
@@ -249,8 +274,8 @@ namespace FunctionSeriesClassLibrary {
             Expr prevDerivative = new Expr(Infix.Parse(function).ResultValue);
             for (int i = 1; i < n + 1; i++) {
                 Expr derivative = prevDerivative.Differentiate(x);
-                string pol = Interpreter.GetPolishExpression(derivative.ToString(),ct:ct);
-                if (ct.IsCancellationRequested)return;
+                string pol = Interpreter.GetPolishExpression(derivative.ToString(), ct: ct);
+                if (ct.IsCancellationRequested) return;
                 coefs[i] = Interpreter.SolvePolishExpression(pol, new Dictionary<char, double>() { { 'x', x0 } });
                 double factorial = 1;
                 for (int j = 2; j <= i; j++) factorial *= j;

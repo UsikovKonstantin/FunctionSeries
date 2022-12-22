@@ -47,9 +47,12 @@ Console.WriteLine(new FourierApprox(new List<(double x, double y)>() { (12, 11),
 //Console.WriteLine(TaylorSeries("x^2+2", 2));
 
 
-//TaylorSeries test = new TaylorSeries("sin(x)", 0, 5);
-//TaylorSeries test2 = new TaylorSeries("cos(x)", 0, 5);
-//Console.WriteLine(test);
+TaylorSeries test = new TaylorSeries("cos(x)", 0, 5);
+TaylorSeries test2 = new TaylorSeries("cos(x)", 0, 5);
+Console.WriteLine(test);
+Console.WriteLine(test.GetIntegral().GetDerivative());
+var bruh = test.GetIntegral().GetDerivative();
+Console.WriteLine(bruh == test2);
 //Console.WriteLine(test2);
 //Console.WriteLine(-test2);
 //Console.WriteLine(test.GetIntegral());

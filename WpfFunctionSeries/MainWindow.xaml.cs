@@ -108,8 +108,8 @@ public partial class MainWindow : Window
             },cts.Token);
             Stopwatch sw = Stopwatch.StartNew();
             bool success = false;
-            
-            
+            var tas = Task.Run(() => success = ts.Wait(1000));
+            await tas;
             if (success)
             {
                 Scr_Tay_Terms.Background = Brushes.White;

@@ -44,7 +44,7 @@ namespace FunctionSeriesClassLibrary {
             this.x0 = x0;
             coefs = new double[n + 1];
             this.n = n;
-            if (computeCoefs) FindCoefs();
+            if (computeCoefs) FindCoefs(ct:ct);
         }
 
         /// <summary>

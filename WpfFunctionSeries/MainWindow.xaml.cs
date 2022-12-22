@@ -232,15 +232,6 @@ public partial class MainWindow : Window
         var pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
         W_Plot.Plot.AddFunction(
             x => Interpreter.SolvePolishExpression(pol, new Dictionary<char, double> { { 'x', x } }));
-        var t = cloud_at_range(fs);
-        List<double> xs = new(), ys = new();
-        for (int i = 0; i < t.Count; i++)
-        {
-            xs.Add(t[i].x);
-            ys.Add(t[i].y);
-        }
-
-        W_Plot.Plot.AddScatter(xs.ToArray(), ys.ToArray(),markerShape:ScottPlot.MarkerShape.none);
         // постановка более удобных границ графика
         double max_x = 5;
         var step = max_x * 2 / 1000;
@@ -259,6 +250,17 @@ public partial class MainWindow : Window
         var diff = Math.Abs(aver - max_y) * 1.1;
         if (diff < 0.000001) diff = 1;
         W_Plot.Plot.SetAxisLimits(-max_x, max_x, aver - diff, aver + diff);
+        var t = cloud_at_range(fs);
+        List<double> xs = new(), ys = new();
+        for (int i = 0; i < t.Count; i++)
+        {
+            xs.Add(t[i].x);
+            ys.Add(t[i].y);
+        }
+
+        W_Plot.Plot.AddScatter(xs.ToArray(), ys.ToArray(),markerShape:ScottPlot.MarkerShape.none);
+        taylor_saved = fs;
+        taylor_empty = false;
         W_Plot.Refresh();
     }
 
@@ -266,7 +268,13 @@ public partial class MainWindow : Window
     {
         List<(double x, double y)> cloud = new();
         double min_x = W_Plot.Plot.GetAxisLimits().XMin, max_x = W_Plot.Plot.GetAxisLimits().XMax;
+        double aver = (min_x + max_x) / 2;
+        double diff = Math.Abs(aver - min_x);
+        min_x = aver - (diff * 1.2); max_x = aver + (diff*1.2);
         double min_y = W_Plot.Plot.GetAxisLimits().YMin - 1, max_y = W_Plot.Plot.GetAxisLimits().YMax + 1;
+        aver = (min_y + max_y) / 2;
+        diff = Math.Abs(aver - min_y);
+        min_y = aver - (diff * 1.2); max_y = aver + (diff*1.2);
         double step = (max_x - min_x) / 1000;
         for (var i = min_x; i <= max_x; i+= step)
         {
@@ -438,5 +446,29 @@ public partial class MainWindow : Window
             Tx_Tay_Terms_Input.Text = prev_scroll_value_Tay.ToString();
             General_Calc(sender, e);
         }
+    }
+
+    private TaylorSeries taylor_saved;
+    private bool taylor_empty = true;
+    private void W_Plot_OnAxesChanged(object? sender, EventArgs e)
+    {
+        if (!IsInitialized) return;
+        if (!Rb_Taylor.IsChecked.Value || taylor_empty) return;
+        var lim = W_Plot.Plot.GetAxisLimits();
+        W_Plot.Plot.Clear();
+        W_Plot.Plot.SetAxisLimits(lim);
+        var pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
+        W_Plot.Plot.AddFunction(
+            x => Interpreter.SolvePolishExpression(pol, new Dictionary<char, double> { { 'x', x } }));
+        var t = cloud_at_range(taylor_saved);
+        List<double> xs = new(), ys = new();
+        for (int i = 0; i < t.Count; i++)
+        {
+            xs.Add(t[i].x);
+            ys.Add(t[i].y);
+        }
+
+        W_Plot.Plot.AddScatter(xs.ToArray(), ys.ToArray(),markerShape:ScottPlot.MarkerShape.none);
+        W_Plot.Plot.SetAxisLimits(lim);
     }
 }

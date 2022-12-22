@@ -73,7 +73,7 @@
                 </Grid>
             </GroupBox>
         </Grid>
-        <WpfPlot Grid.Row="1" x:Name="W_Plot" />
+        <WpfPlot Grid.Row="1" x:Name="W_Plot" AxesChanged="W_Plot_OnAxesChanged"/>
         <StackPanel Grid.Row="2" Orientation="Horizontal">
             <Button Name="Bt_Help" Click="Bt_Help_OnClick">
                 <StackPanel Orientation="Horizontal">

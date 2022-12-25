@@ -36,17 +36,259 @@ namespace FunctionSeriesTest
         {
             x = 1;
             test = "(18*sin(2*x)) + 11*x^3 / (11 * cos(3*x)) + 13*x";
-            Assert.AreEqual(Interpreter.SolvePolishExpression(Interpreter.GetPolishExpression(test), new Dictionary<char, double> { { 'x', x } }), 2,798102101837749);
+            Assert.AreEqual(Interpreter.SolvePolishExpression(Interpreter.GetPolishExpression(test), new Dictionary<char, double> { { 'x', x } }), 2, 798102101837749);
         }
     }
 
     [TestClass]
-    public class FourierApproxTest
+    public class FourierSeriesTest
     {
         [TestMethod]
-        public void FourierAppTest()
+        public void FourierSerTest()
         {
-            
+            var test = new FourierSeries();
+            Assert.AreEqual(test.ToString(), "cos(x) + sin(x)");
+        }
+
+        [TestMethod]
+        public void FourierSer2Test()
+        {
+            var test = new FourierSeries(1, 1, "x + 1", FourierSeriesType.Sin);
+            Assert.AreEqual(test.ToString(), "1,591516705860902*sin(6,283185307179586*x)");
+        }
+
+        [TestMethod]
+        public void FourierSer2Test2()
+        {
+            var test = new FourierSeries(2, 10, "x * 2", FourierSeriesType.Cos);
+            Assert.AreEqual(test.ToString(), "5 - 4,052930680054939*cos(0,6283185307179586*x) + 1,7585932710062481E-15*cos(1,2566370614359172*x)");
+        }
+
+        [TestMethod]
+        public void FourierSer3Test()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            Assert.AreEqual(test.ToString(), new FourierSeries().ToString());
+        }
+
+        [TestMethod]
+        public void FourierSer3Test2()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            Assert.AreEqual(test.ToString(), "cos(x) + sin(x)");
+        }
+
+        [TestMethod]
+        public void FourierSer3Test3()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            Assert.AreEqual(test.ToString(), "5 + 15*cos(2*x) + 20*sin(2*x)");
+        }
+
+        [TestMethod]
+        public void ComputeTest()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            Assert.AreEqual(test.Compute(0.1).ToString(), "1,094837581924854");
+        }
+
+        [TestMethod]
+        public void ComputeTest2()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            Assert.AreEqual(test.Compute(15).ToString(), "-0,10940007270170449");
+        }
+
+        [TestMethod]
+        public void ComputeTest3()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            Assert.AreEqual(test.Compute(1).ToString(), "16,9437459883065");
+        }
+
+        [TestMethod]
+        public void IntegralTest()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            Assert.AreEqual(test.Integral("e x ^", -3.14, 3.14, 50000).ToString(), "23,06058409113614");
+        }
+
+        [TestMethod]
+        public void IntegralTest2()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            Assert.AreEqual(test.Integral("e", -3.14, 3.14, 50000).ToString(), "17,070809882730966");
+        }
+
+        [TestMethod]
+        public void IntegralTest3()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            Assert.AreEqual(test.Integral("e 2 ^", -3.14, 3.14, 100000).ToString(), "46,40327230121512");
+        }
+
+        [TestMethod]
+        public void GetDerivativeTest()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.Sin);
+            Assert.AreEqual(test.GetDerivative().ToString(), "cos(x) - sin(x)");
+        }
+
+        [TestMethod]
+        public void GetDerivativeTest2()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            Assert.AreEqual(test.GetDerivative().ToString(), "cos(x) - sin(x)");
+        }
+
+        [TestMethod]
+        public void GetDerivativeTest3()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            Assert.AreEqual(test.GetDerivative().ToString(), "40*cos(2*x) + -30*sin(2*x)");
+        }
+
+        [TestMethod]
+        public void GetIntegralTest()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.Sin);
+            Assert.AreEqual(test.GetIntegral().ToString(), "-cos(x) + sin(x)");
+        }
+
+        [TestMethod]
+        public void GetIntegralTest2()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            Assert.AreEqual(test.GetIntegral().ToString(), "-cos(x) + sin(x)");
+        }
+
+        [TestMethod]
+        public void GetIntegralTest3()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            Assert.AreEqual(test.GetIntegral().ToString(), "-10*cos(2*x) + 7,5*sin(2*x)");
+        }
+
+        [TestMethod]
+        public void AddTest()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.Sin);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test3 = test + test2;
+            Assert.AreEqual(test3.ToString(), "5 + 16*cos(x) + 21*sin(x)");
+        }
+
+        [TestMethod]
+        public void AddTest2()
+        {
+            var test = new FourierSeries(new double[] { 12, 8 }, new double[] { 3, 8 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test3 = test + test2;
+            Assert.AreEqual(test3.ToString(), "11 + 23*cos(x) + 28*sin(x)");
+        }
+
+        [TestMethod]
+        public void AddTest3()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Sin);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test3 = test + test2;
+            Assert.AreEqual(test3.ToString(), "10 + 30*cos(2*x) + 40*sin(2*x)");
+        }
+
+        [TestMethod]
+        public void SubTest()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.Sin);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test3 = test - test2;
+            Assert.AreEqual(test3.ToString(), "-5 - 14*cos(x) - 19*sin(x)");
+        }
+
+        [TestMethod]
+        public void SubTest2()
+        {
+            var test = new FourierSeries(new double[] { 12, 8 }, new double[] { 3, 8 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test3 = test - test2;
+            Assert.AreEqual(test3.ToString(), "1 - 7*cos(x) - 12*sin(x)");
+        }
+
+        [TestMethod]
+        public void SubTest3()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Sin);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test3 = test - test2;
+            Assert.AreEqual(test3.ToString(), "");
+        }
+
+        [TestMethod]
+        public void EqualTest()
+        {
+            var test = new FourierSeries(new double[] { 12, 8 }, new double[] { 3, 8 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            bool test3 = test == test2;
+            Assert.AreEqual(test3, false);
+        }
+
+        [TestMethod]
+        public void EqualTest2()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            bool test3 = test == test2;
+            Assert.AreEqual(test3, true);
+        }
+
+        [TestMethod]
+        public void NonEqualTest()
+        {
+            var test = new FourierSeries(new double[] { 12, 8 }, new double[] { 3, 8 }, 2 * Math.PI, FourierSeriesType.CosSin);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            bool test3 = test != test2;
+            Assert.AreEqual(test3, true);
+        }
+
+        [TestMethod]
+        public void NonEqualTest2()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test2 = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            bool test3 = test != test2;
+            Assert.AreEqual(test3, false);
+        }
+
+        [TestMethod]
+        public void Mul1Test()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.Sin);
+            var test2 = 10 * test;
+            Assert.AreEqual(test2.ToString(), "10*cos(x) + 10*sin(x)");
+        }
+
+        [TestMethod]
+        public void Mul1Test2()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test2 = 3 * test;
+            Assert.AreEqual(test2.ToString(), "15 + 45*cos(2*x) + 60*sin(2*x)");
+        }
+
+        [TestMethod]
+        public void Mul2Test()
+        {
+            var test = new FourierSeries(new double[] { 0.0, 1.0 }, new double[] { 0.0, 1.0 }, 2 * Math.PI, FourierSeriesType.Sin);
+            var test2 = test * 10;
+            Assert.AreEqual(test2.ToString(), "10*cos(x) + 10*sin(x)");
+        }
+
+        [TestMethod]
+        public void Mul2Test2()
+        {
+            var test = new FourierSeries(new double[] { 10, 15 }, new double[] { 15, 20 }, Math.PI, FourierSeriesType.Cos);
+            var test2 = test * 3;
+            Assert.AreEqual(test2.ToString(), "15 + 45*cos(2*x) + 60*sin(2*x)");
         }
     }
 

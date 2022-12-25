@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace FunctionSeriesClassLibrary
+﻿namespace FunctionSeriesClassLibrary
 {
     /// <summary>
     /// Тип ряда Фурье.
@@ -20,12 +18,15 @@ namespace FunctionSeriesClassLibrary
     /// </summary>
     public class FourierSeries
     {
+        #region Поля
         private int n = 0;  // количество членов
         private double l = 0;  // полупериод функции
         private double[] a = new double[0];  // коэффициенты при косинусах 
         private double[] b = new double[0];  // коэффициенты при синусах
         private FourierSeriesType type = FourierSeriesType.CosSin;  // тип ряда
+        #endregion
 
+        #region Свойства
         /// <summary>
         /// Свойство "количество членов".
         /// </summary>
@@ -61,7 +62,9 @@ namespace FunctionSeriesClassLibrary
         {
             get { return type; }
         }
+        #endregion
 
+        #region Конструкторы
         /// <summary>
         /// Конструктор по умолчанию.
         /// Создаёт ряд sin(x) + cos(x).
@@ -73,24 +76,6 @@ namespace FunctionSeriesClassLibrary
             b = new double[] { 0, 1 };
             l = Math.PI;
             type = FourierSeriesType.CosSin;
-        }
-
-        /// <summary>
-        /// Конструктор ряда Фурье по функции.
-        /// </summary>
-        /// <param name="n"> количество членов </param>
-        /// <param name="period"> период функции </param>
-        /// <param name="function"> функция, по которой строится ряд </param>
-        /// <param name="type"> тип ряда </param>
-        public FourierSeries(int n, double period, string function, FourierSeriesType type)
-        {
-            this.n = n;
-            this.type = type;
-            l = period / 2;
-            a = new double[n + 1];
-            b = new double[n + 1];
-            string polFunc = Interpreter.GetPolishExpression(function);
-            FindCoefs(polFunc);
         }
 
         /// <summary>
@@ -110,32 +95,52 @@ namespace FunctionSeriesClassLibrary
         }
 
         /// <summary>
-        /// Поиск коэффициентов ряда Фурье.
+        /// Конструктор ряда Фурье по функции.
         /// </summary>
-        /// <param name="polFunc"> польская запись исходной функции </param>
-        private void FindCoefs(string polFunc)
+        /// <param name="n"> количество членов </param>
+        /// <param name="period"> период функции </param>
+        /// <param name="function"> функция, по которой строится ряд </param>
+        /// <param name="type"> тип ряда </param>
+        public FourierSeries(int n, double period, string function, FourierSeriesType type)
         {
-            const int STEPS = 200, STEPS_SYMM = 100;
-            double PI_DIV_L = Math.PI / l, ONE_DIV_L = 1 / l, TWO_DIV_L = ONE_DIV_L * 2;
-            string polSin = " x * sin *", polCos = " x * cos *";
-            if (type == FourierSeriesType.Sin)
-                Parallel.For(1, n + 1, i =>
-                    b[i] = TWO_DIV_L * Integral(polFunc + (i * PI_DIV_L) + polSin, 0, l, STEPS_SYMM));
-            else if (type == FourierSeriesType.Cos)
-                Parallel.For(0, n + 1, i =>
-                    a[i] = TWO_DIV_L * Integral(polFunc + (i * PI_DIV_L) + polCos, 0, l, STEPS_SYMM));
-            else
-                Parallel.For(0, n + 1, i =>
-                {
-                    a[i] = ONE_DIV_L * Integral(polFunc + (i * PI_DIV_L) + polCos, -l, l, STEPS);
-                    b[i] = ONE_DIV_L * Integral(polFunc + (i * PI_DIV_L) + polSin, -l, l, STEPS);
-                });
+            this.n = n;
+            this.type = type;
+            l = period / 2;
+            a = new double[n + 1];
+            b = new double[n + 1];
+            FindCoefs(function);
         }
 
         /// <summary>
+        /// Поиск коэффициентов ряда Фурье.
+        /// </summary>
+        /// <param name="function"> строковое представление функции </param>
+        private void FindCoefs(string function)
+        {
+            const int STEPS = 200;
+            double PI_DIV_L = Math.PI / l, ONE_DIV_L = 1 / l, TWO_DIV_L = ONE_DIV_L * 2;
+            string polFunc = Interpreter.GetPolishExpression(function);
+            string polSin = polFunc + "{0} x * sin *", polCos = polFunc + "{0} x * cos *";
+            if (type == FourierSeriesType.Sin)
+                Parallel.For(1, n + 1, i =>
+                    b[i] = TWO_DIV_L * Integral(string.Format(polSin, i * PI_DIV_L), 0, l, STEPS));
+            else if (type == FourierSeriesType.Cos)
+                Parallel.For(0, n + 1, i =>
+                    a[i] = TWO_DIV_L * Integral(string.Format(polCos, i * PI_DIV_L), 0, l, STEPS));
+            else
+                Parallel.For(0, n + 1, i =>
+                {
+                    a[i] = ONE_DIV_L * Integral(string.Format(polCos, i * PI_DIV_L), -l, l, STEPS);
+                    b[i] = ONE_DIV_L * Integral(string.Format(polSin, i * PI_DIV_L), -l, l, STEPS);
+                });
+        }
+        #endregion
+
+        #region Переопределение ToString()
+        /// <summary>
         /// Переопределение метода ToString().
         /// </summary>
-        /// <returns> строковое представление ряда Фурье </returns>
+        /// <returns> строковое представление ряда Фурье </returns> 
         public override string ToString()
         {
             int i = 0;
@@ -145,14 +150,14 @@ namespace FunctionSeriesClassLibrary
             {
                 if (a[j] != 0)
                     if (Math.Abs(a[j]) == 1)
-                        res += (a[j] == 1 ? " + " : " - ") + "Cos(" + (j * PI_DIV_L) + "x)";
+                        res += (a[j] == 1 ? " + " : " - ") + "cos(" + (j * PI_DIV_L == 1 ? "" : j * PI_DIV_L + "*") + "x)";
                     else
-                        res += (a[j] > 0 ? " + " : " - ") + Math.Abs(a[j]) + "*" + "Cos(" + (j * PI_DIV_L) + "x)";
+                        res += (a[j] > 0 ? " + " : " - ") + Math.Abs(a[j]) + "*" + "cos(" + (j * PI_DIV_L == 1 ? "" : j * PI_DIV_L + "*") + "x)";
                 if (b[j] != 0)
                     if (Math.Abs(b[j]) == 1)
-                        res += (b[j] == 1 ? " + " : " - ") + "Sin(" + (j * PI_DIV_L) + "x)";
+                        res += (b[j] == 1 ? " + " : " - ") + "sin(" + (j * PI_DIV_L == 1 ? "" : j * PI_DIV_L + "*") + "x)";
                     else
-                        res += (b[j] > 0 ? " + " : " - ") + Math.Abs(b[j]) + "*" + "Sin(" + (j * PI_DIV_L) + "x)";
+                        res += (b[j] > 0 ? " + " : " - ") + Math.Abs(b[j]) + "*" + "sin(" + (j * PI_DIV_L == 1 ? "" : j * PI_DIV_L + "*") + "x)";
             }
             return res;
         }
@@ -172,28 +177,30 @@ namespace FunctionSeriesClassLibrary
                 if (a[i] != 0)
                 {
                     if (Math.Abs(a[i]) == 1)
-                        res += (a[i] == 1 ? "" : "-") + "Cos(" + (i * PI_DIV_L) + "x)";
+                        res += (a[i] == 1 ? "" : "-") + "cos(" + (i * PI_DIV_L == 1 ? "" : i * PI_DIV_L + "*") + "x)";
                     else
-                        res += a[i] + "*" + "Cos(" + (i * PI_DIV_L) + "x)";
+                        res += a[i] + "*" + "cos(" + (i * PI_DIV_L == 1 ? "" : i * PI_DIV_L + "*") + "x)";
                     if (b[i] != 0)
                         if (Math.Abs(b[i]) == 1)
-                            res += (b[i] == 1 ? " + " : " - ") + "Sin(" + (i * PI_DIV_L) + "x)";
+                            res += (b[i] == 1 ? " + " : " - ") + "sin(" + (i * PI_DIV_L == 1 ? "" : i * PI_DIV_L + "*") + "x)";
                         else
-                            res += " + " + b[i] + "*" + "Sin(" + (i * PI_DIV_L) + "x)";
+                            res += " + " + b[i] + "*" + "sin(" + (i * PI_DIV_L == 1 ? "" : i * PI_DIV_L + "*") + "x)";
                     return res;
                 }
                 if (b[i] != 0)
                 {
                     if (Math.Abs(b[i]) == 1)
-                        res += (b[i] == 1 ? "" : "-") + "Sin(" + (i * PI_DIV_L) + "x)";
+                        res += (b[i] == 1 ? "" : "-") + "sin(" + (i * PI_DIV_L == 1 ? "" : i * PI_DIV_L + "*") + "x)";
                     else
-                        res += b[i] + "*" + "Sin(" + (i * PI_DIV_L) + "x)";
+                        res += b[i] + "*" + "sin(" + (i * PI_DIV_L == 1 ? "" : i * PI_DIV_L + "*") + "x)";
                     return res;
                 }
             }
             return res;
         }
+        #endregion
 
+        #region Методы
         /// <summary>
         /// Вычисление значения в точке.
         /// </summary>
@@ -267,7 +274,9 @@ namespace FunctionSeriesClassLibrary
             }
             return new FourierSeries(AA, BB, 2 * l, type);
         }
+        #endregion
 
+        #region Перегрузка арифметических операторов
         /// <summary>
         /// Сложение рядов с одинаковым периодом.
         /// </summary>
@@ -361,6 +370,38 @@ namespace FunctionSeriesClassLibrary
         }
 
         /// <summary>
+        /// Умножение ряда на число.
+        /// </summary>
+        /// <param name="k"> число </param>
+        /// <param name="fs"> ряд Фурье </param>
+        /// <returns> ряд Фурье - результат умножения </returns>
+        public static FourierSeries operator *(double k, FourierSeries fs)
+        {
+            int n = fs.n;
+            double[] A = new double[n + 1];
+            double[] B = new double[n + 1];
+            for (int i = 0; i <= n; i++)
+            {
+                A[i] = k * fs.A[i];
+                B[i] = k * fs.B[i];
+            }
+            return new FourierSeries(A, B, 2 * fs.l, fs.type);
+        }
+
+        /// <summary>
+        /// Умножение ряда на число.
+        /// </summary>
+        /// <param name="fs"> ряд Фурье </param>
+        /// <param name="k"> число </param>
+        /// <returns> ряд Фурье - результат умножения </returns>
+        public static FourierSeries operator *(FourierSeries fs, double k)
+        {
+            return k * fs;
+        }
+        #endregion
+
+        #region Перегрузка операторов сравнения
+        /// <summary>
         /// Переопределение оператора сравнения.
         /// </summary>
         /// <param name="f1"> первый ряд </param>
@@ -407,35 +448,6 @@ namespace FunctionSeriesClassLibrary
         {
             return HashCode.Combine(n, l, a, b, type);
         }
-
-        /// <summary>
-        /// Умножение ряда на число.
-        /// </summary>
-        /// <param name="k"> число </param>
-        /// <param name="fs"> ряд Фурье </param>
-        /// <returns> ряд Фурье - результат умножения </returns>
-        public static FourierSeries operator *(double k, FourierSeries fs)
-        {
-            int n = fs.n;
-            double[] A = new double[n + 1];
-            double[] B = new double[n + 1];
-            for (int i = 0; i <= n; i++)
-            {
-                A[i] = k * fs.A[i];
-                B[i] = k * fs.B[i];
-            }
-            return new FourierSeries(A, B, 2 * fs.l, fs.type);
-        }
-
-        /// <summary>
-        /// Умножение ряда на число.
-        /// </summary>
-        /// <param name="fs"> ряд Фурье </param>
-        /// <param name="k"> число </param>
-        /// <returns> ряд Фурье - результат умножения </returns>
-        public static FourierSeries operator *(FourierSeries fs, double k)
-        {
-            return k * fs;
-        }
+        #endregion
     }
 }

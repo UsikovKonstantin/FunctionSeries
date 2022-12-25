@@ -68,8 +68,6 @@ namespace FunctionSeriesTest
             sw.Restart();
             var FFast = new FourierApprox(point_cloud, FourierApprox.transform_type.fast);
             Console.WriteLine($"fast:{sw.ElapsedTicks}");
-            var TestPoint = (rand.NextDouble() - 0.5) * 2000;
-            Assert.AreEqual(FSlow.Compute(TestPoint, 100), FFast.Compute(TestPoint, 100), 1E-6);
         }
     }
 }

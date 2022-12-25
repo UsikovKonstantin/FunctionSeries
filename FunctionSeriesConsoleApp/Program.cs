@@ -16,7 +16,7 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 //bool test2 = Interpreter.IsVarInPolExpression(test);
 //Console.WriteLine(test2);
 
-Console.WriteLine(new FourierApprox(new List<(double x, double y)>() { (12, 11), (8, 11) }, FourierApprox.transform_type.fast));
+//Console.WriteLine(new FourierApprox(new List<(double x, double y)>() { (12, 11), (8, 11) }, FourierApprox.transform_type.fast));
 
 
 //Expr x = Expr.Variable("x");
@@ -47,12 +47,12 @@ Console.WriteLine(new FourierApprox(new List<(double x, double y)>() { (12, 11),
 //Console.WriteLine(TaylorSeries("x^2+2", 2));
 
 
-TaylorSeries test = new TaylorSeries("cos(x)", 0, 5);
-TaylorSeries test2 = new TaylorSeries("cos(x)", 0, 5);
-Console.WriteLine(test);
-Console.WriteLine(test.GetIntegral().GetDerivative());
-var bruh = test.GetIntegral().GetDerivative();
-Console.WriteLine(bruh == test2);
+//TaylorSeries test = new TaylorSeries("cos(x)", 0, 5);
+//TaylorSeries test2 = new TaylorSeries("cos(x)", 0, 5);
+//Console.WriteLine(test);
+//Console.WriteLine(test.GetIntegral().GetDerivative());
+//var bruh = test.GetIntegral().GetDerivative();
+//Console.WriteLine(bruh == test2);
 //Console.WriteLine(test2);
 //Console.WriteLine(-test2);
 //Console.WriteLine(test.GetIntegral());
@@ -72,3 +72,6 @@ Console.WriteLine(bruh == test2);
 //Console.WriteLine(FunctionHelper.GetType("1"));
 //Console.WriteLine(FunctionHelper.GetType("e^x"));
 //Console.WriteLine(FunctionHelper.GetType("x^2 + x"));
+
+FourierSeries fs = new FourierSeries(new double[] { 1, 2, 4, -5}, new double[] { 1, 2, 4, -5 }, 5, FourierSeriesType.CosSin);
+Console.WriteLine(fs);

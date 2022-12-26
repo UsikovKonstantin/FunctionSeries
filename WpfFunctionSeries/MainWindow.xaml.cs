@@ -157,12 +157,7 @@ public partial class MainWindow : Window
                 throw new ArgumentOutOfRangeException();
         }
     }
-
-    private double solve_at(double x, string polish)
-    {
-        return Interpreter.SolvePolishExpression(polish, new Dictionary<char, double> { { 'x', x } });
-    }
-
+    
     private void checks_terms_taylor()
     {
         // Проверка количества коэфициентов
@@ -434,7 +429,7 @@ public partial class MainWindow : Window
         {
             Dictionary<char, double> t = new();
             t.Add('x', 0.5);
-            var function = convert_to_interpret(Tx_Fun_Input.Text);
+            var function = Tx_Fun_Input.Text;
             Interpreter.SolvePolishExpression(Interpreter.GetPolishExpression(function), t);
             Tx_Fun_Input.ToolTip = "";
             Tx_Fun_Input.Background = Brushes.White;
@@ -447,13 +442,7 @@ public partial class MainWindow : Window
             return false;
         }
     }
-
-    // Конвертация в формат понимаемый интерпретатором
-    private string convert_to_interpret(string function)
-    {
-        return function.Replace("sqrt", "√");
-    }
-
+    
     private void Bt_Help_OnClick(object sender, RoutedEventArgs e)
     {
         // Вызов окна со справкой

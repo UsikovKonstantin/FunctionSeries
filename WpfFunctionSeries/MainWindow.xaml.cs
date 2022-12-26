@@ -94,6 +94,8 @@ public partial class MainWindow : Window
         {
         }
 
+        string function = Tx_Fun_Input.Text;
+        function = function.Replace("x!", "((sqrt(2*π*x))*((x/e)^x))");
         if (Rb_Fourier.IsChecked.Value)
         {
             checks_terms();
@@ -102,7 +104,7 @@ public partial class MainWindow : Window
             if (Rb_Cos.IsChecked.Value) type = FourierSeriesType.Cos;
             else if (Rb_Sin.IsChecked.Value) type = FourierSeriesType.Sin;
             else type = FourierSeriesType.CosSin;
-            FourierSeries fs = new(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text), Tx_Fun_Input.Text,
+            FourierSeries fs = new(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text), function,
                 type);
             Update_Plot(fs);
         }
@@ -114,13 +116,11 @@ public partial class MainWindow : Window
             var ts = Task.Run(() =>
             {
                 var ds = Dispatcher;
-                string fun_text = null;
-                ds.Invoke(() => fun_text = Tx_Fun_Input.Text);
                 double x0 = 0;
                 ds.Invoke(() => x0 = double.Parse(Tx_Per_Input.Text));
                 var n = 5;
                 ds.Invoke(() => n = int.Parse(Tx_Tay_Terms_Input.Text));
-                return new TaylorSeries(fun_text, x0, n, ct: cts.Token);
+                return new TaylorSeries(function, x0, n, ct: cts.Token);
             }, cts.Token);
             var success = false;
             await Task.Run(() => success = ts.Wait(1000), cts.Token);
@@ -438,9 +438,6 @@ public partial class MainWindow : Window
             t.Add('x', 0.5);
             var function = Tx_Fun_Input.Text;
             Interpreter.SolvePolishExpression(Interpreter.GetPolishExpression(function), t);
-            Tx_Fun_Input.ToolTip = "";
-            Tx_Fun_Input.Background = Brushes.White;
-            return true;
         }
         catch (Exception)
         {
@@ -448,6 +445,16 @@ public partial class MainWindow : Window
             Tx_Fun_Input.Background = Brushes.Red;
             return false;
         }
+        string fn = Tx_Fun_Input.Text;
+        if (fn.Contains(")x") || fn.Contains("x("))
+        {
+            Tx_Fun_Input.ToolTip = "Недопустимый способ помещения переменной в функцию.";
+            Tx_Fun_Input.Background = Brushes.Red;
+            return false;
+        }
+        Tx_Fun_Input.ToolTip = "";
+        Tx_Fun_Input.Background = Brushes.White;
+        return true;
     }
     
     private void Bt_Help_OnClick(object sender, RoutedEventArgs e)

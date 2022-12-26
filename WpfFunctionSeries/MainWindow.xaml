@@ -40,10 +40,10 @@
                     <RadioButton Name="Rb_Sin"
                                  Content="Функция нечетная (по синусам)"
                                  VerticalContentAlignment="Center"
-                                 Click="General_Calc" />
+                                 Click="General_Calc" Margin="20,0,0,0" />
                     <RadioButton Name="Rb_Asym" Content="Функция аморфна (не обладает симметрией)" IsChecked="True"
                                  VerticalContentAlignment="Center"
-                                 Click="General_Calc" />
+                                 Click="General_Calc" Margin="20,0,0,0" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="1" Header="Разложения">
@@ -52,7 +52,7 @@
                                  Click="General_Calc"
                                  IsChecked="True" />
                     <RadioButton Name="Rb_Taylor" Content="Разложение в ряд Тейлора" VerticalContentAlignment="Center"
-                                 Click="General_Calc" />
+                                 Click="General_Calc" Margin="20,0,0,0" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="4" Header="Степень разложения в ряд Тейлора">

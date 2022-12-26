@@ -8,8 +8,7 @@ public partial class Help : Window
     {
         InitializeComponent();
         Block.Text = "Функция должна содержать переменную x\n" +
-                     "Допустимые функции: sin, cos, tan, ctan, arcsin, arccos, atan, actan, log, ln, sqrt,\n" +
-                     "sinh, cosh\n" +
+                     "Допустимые функции: sin, cos, tan, ctan, arcsin, arccos, atan, actan, log, ln, sqrt\n" +
                      "Допустимые операторы: ^ + - / * !\n" +
                      "Функции записываются: функция()\n" +
                      "Можно записать функцию без переменных\n" +

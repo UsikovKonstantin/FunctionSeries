@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
-        Title="Help" Height="230" Width="800" FontSize="20">
+        Title="Help" Height="200" Width="800" FontSize="20">
     <Grid>
         <TextBlock Name="Block" />
     </Grid>

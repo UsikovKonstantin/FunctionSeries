@@ -10,16 +10,16 @@
             string output = "";
             Stack<string> operStack = new Stack<string>();
 
+            // Флаги необходимые для работы с минусами
             bool holdMinus = false;
             bool isPrevElOper = true;
             for (int i = 0; i < input.Length; i++) {
                 if (IsDelimeter(input[i])) continue;
                 if (ct.IsCancellationRequested) return "x";
-                if (IsOperator(input[i])) HandleOperator(input[i], operStack, ref output, ref isPrevElOper, ref holdMinus, ct:ct);
+                if (IsOperator(input[i])) HandleOperator(input[i], operStack, ref output, ref isPrevElOper, ref holdMinus, ct: ct);
                 else if (IsFunction(i, input)) HandleFunction(input, ref i, operStack, ref isPrevElOper, ref holdMinus);
-                else if (IsValue(input[i])) HandleValue(input, ref i, ref output, ref isPrevElOper, ref holdMinus, ct:ct);
+                else if (IsValue(input[i])) HandleValue(input, ref i, ref output, ref isPrevElOper, ref holdMinus, ct: ct);
             }
-
             // Когда прошли по всем символам, выкидываем из стека все оставшиеся там операции в строку
             while (operStack.Count > 0)
                 output += operStack.Pop() + " ";
@@ -37,17 +37,11 @@
             Stack<double> values = new Stack<double>();
             string[] polishNotation = ConvertVarsToNums(s.Trim().Split(' '), variables);
             foreach (string cur in polishNotation) {
-                if (!IsFunction(0, cur)) {
-                    if (cur.Length == 1 && IsOperator(char.Parse(cur))) {
-                        // Вычисление значений в зависимости от операции
-                        double result = ComputeOperation(cur, values);
-                        values.Push(result);
-                    } else values.Push(double.Parse(cur));
-                } else {
-                    //  Вычисление значений в зависимости от операции
+                if (IsFunction(0, cur) || (cur.Length == 1 && IsOperator(char.Parse(cur)))) {
+                    // Вычисление значений в зависимости от операции
                     double result = ComputeOperation(cur, values);
                     values.Push(result);
-                }
+                } else values.Push(double.Parse(cur));
             }
 
             return values.Pop();
@@ -125,16 +119,15 @@
                 }
                 if (s == "-(") operStack.Push("_");
             } else {
+                // Если предыдущий элемент был оператор, то мы не проверяем текущий элемент и бывший на приоритеты
                 if (!isPrevElOper) {
-                    while (operStack.Count > 0 && GetPriority(oper.ToString()) <= GetPriority(operStack.Peek().ToString()))
-                    {
+                    // Проверяем если предыдущий элемент имеет больший приоритет
+                    while (operStack.Count > 0 && GetPriority(oper.ToString()) <= GetPriority(operStack.Peek().ToString())) {
                         output += operStack.Pop().ToString() + ' ';
                     }
                 }
-
                 if (oper == '-' && isPrevElOper) holdMinus = true;
                 else operStack.Push(oper.ToString());
-
             }
             if (oper != ')' && oper != '!') isPrevElOper = true;
         }

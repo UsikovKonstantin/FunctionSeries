@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FunctionSeriesClassLibrary {
+﻿namespace FunctionSeriesClassLibrary {
     public static class Interpreter {
         /// <summary>
         /// Возвращает польскую запись в строчном виде
@@ -115,7 +111,6 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
         private static void HandleOperator(char oper, Stack<string> operStack, ref string output, ref bool isPrevElOper, ref bool holdMinus, CancellationToken ct = new()) {
             if (ct.IsCancellationRequested) return;
-            StringBuilder sb = new StringBuilder();
             if (oper == '(') {
                 operStack.Push((holdMinus ? "-" : "") + oper.ToString());
                 holdMinus = false;
@@ -125,8 +120,7 @@ namespace FunctionSeriesClassLibrary {
 
                 while (s != "(" && s != "-(") {
                     if (ct.IsCancellationRequested) return;
-                    sb.Append(s.ToString());
-                    sb.Append(' ');
+                    output += s.ToString() + ' ';
                     s = operStack.Pop();
                 }
                 if (s == "-(") operStack.Push("_");
@@ -134,8 +128,7 @@ namespace FunctionSeriesClassLibrary {
                 if (!isPrevElOper) {
                     while (operStack.Count > 0 && GetPriority(oper.ToString()) <= GetPriority(operStack.Peek().ToString()))
                     {
-                        sb.Append(operStack.Pop().ToString());
-                        sb.Append(' ');
+                        output += operStack.Pop().ToString() + ' ';
                     }
                 }
 
@@ -144,7 +137,6 @@ namespace FunctionSeriesClassLibrary {
 
             }
             if (oper != ')' && oper != '!') isPrevElOper = true;
-            output += sb.ToString();
         }
 
         /// <summary>
@@ -189,22 +181,19 @@ namespace FunctionSeriesClassLibrary {
         /// <param name="holdMinus">устанавливает если нужно применить минус к числу/переменной/функции/перед скобкой</param>
         private static void HandleValue(string input, ref int i, ref string output, ref bool isPrevElOper, ref bool holdMinus, CancellationToken ct = new()) {
             if (ct.IsCancellationRequested) return;
-            StringBuilder sb = new StringBuilder();
             if (holdMinus) {
-                sb.Append('-');
+                output += '-';
                 holdMinus = false;
             }
             // Читаем до разделителя или оператора, чтобы получить число
             while (!IsDelimeter(input[i]) && !IsOperator(input[i])) {
-                sb.Append(input[i]);
+                output += input[i];
                 i++;
                 if (ct.IsCancellationRequested) return;
                 // Если символ - последний, то выходим из цикла
                 if (i == input.Length) break;
             }
-
-            sb.Append(' ');
-            output += sb.ToString();
+            output += ' ';
             i--;
             isPrevElOper = false;
         }

@@ -50,7 +50,7 @@ public partial class MainWindow : Window
             GBox_Add_fun.Header = "Период функции";
             var t = (Grid)GBox_Add_fun.Parent;
             Tx_Per_Input.Text = (2 * Math.PI).ToString();
-            t.ColumnDefinitions[1].Width = new GridLength(170);
+            t.ColumnDefinitions[1].Width = new GridLength(200);
             Grid_sub.RowDefinitions[2].Height = new GridLength(70);
             Grid_sub.RowDefinitions[3].Height = new GridLength(70);
             Grid_sub.RowDefinitions[4].Height = new GridLength(0);
@@ -72,7 +72,17 @@ public partial class MainWindow : Window
     private async void General_Calc(object sender, RoutedEventArgs e)
     {
         if (!IsInitialized) return;
-        Set_Up_UI();
+        try
+        {
+            if (((RadioButton)sender).Name is "Rb_Fourier" or "Rb_Taylor" )
+            {
+                Set_Up_UI();
+                return;
+            }
+        }
+        catch (Exception exception)
+        {
+        }
         if (!checks_Fun()) return;
         try
         {
@@ -112,10 +122,8 @@ public partial class MainWindow : Window
                 ds.Invoke(() => n = int.Parse(Tx_Tay_Terms_Input.Text));
                 return new TaylorSeries(fun_text, x0, n, ct: cts.Token);
             }, cts.Token);
-            var sw = Stopwatch.StartNew();
             var success = false;
-            var tas = Task.Run(() => success = ts.Wait(1000));
-            await tas;
+            await Task.Run(() => success = ts.Wait(1000), cts.Token);
             if (success)
             {
                 Scr_Tay_Terms.Background = Brushes.White;
@@ -211,21 +219,23 @@ public partial class MainWindow : Window
         }
 
         var minus_counter = 0;
-        if (symbols[0] != '-') minus_counter = 1;
-        for (var index = 0; index < symbols.Count; index++)
+        if (symbols.Count != 0)
         {
-            var chars = symbols[index];
-            if (chars == '-')
+            if (symbols[0] != '-') minus_counter = 1;
+            for (var index = 0; index < symbols.Count; index++)
             {
-                minus_counter++;
-                if (minus_counter >= 2)
+                var chars = symbols[index];
+                if (chars == '-')
                 {
-                    symbols.RemoveAt(index);
-                    index--;
+                    minus_counter++;
+                    if (minus_counter >= 2)
+                    {
+                        symbols.RemoveAt(index);
+                        index--;
+                    }
                 }
             }
         }
-
         //Замена текущей строки на корректную
         string corr = new(symbols.ToArray());
         if (corr.Length == 0) corr = "0";

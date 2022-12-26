@@ -22,7 +22,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="170" />
+                    <ColumnDefinition Width="200" />
                 </Grid.ColumnDefinitions>
                 <GroupBox Grid.Column="0" Header="Функция">
                     <TextBox x:Name="Tx_Fun_Input" TextChanged="General_Calc" />

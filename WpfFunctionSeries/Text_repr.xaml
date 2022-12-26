@@ -6,6 +6,6 @@
         mc:Ignorable="d"
         Title="Text_repr" Height="450" Width="800" FontSize="20" Closed="Text_repr_OnClosed">
     <Grid>
-        <TextBox Name="Block" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True"/>
+        <TextBox Name="Block" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" />
     </Grid>
 </Window>

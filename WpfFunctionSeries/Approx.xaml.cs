@@ -11,6 +11,7 @@ namespace WpfFunctionSeries;
 
 public partial class Approx : Window
 {
+    public static int window_count;
     private readonly List<(double x, double y)> point_cloud = new();
 
     private int prev_scroll_value = 5;
@@ -64,14 +65,10 @@ public partial class Approx : Window
         Calculate();
     }
 
-    public static int window_count = 0;
     private void W_Plot_OnMouseEnter(object sender, MouseEventArgs e)
     {
         W_Plot.Focusable = true;
-        if (window_count == 0)
-        {
-            W_Plot.Focus();    
-        }
+        if (window_count == 0) W_Plot.Focus();
     }
 
     private void W_Plot_OnKeyDown(object sender, KeyEventArgs e)
@@ -116,7 +113,7 @@ public partial class Approx : Window
         W_Plot.Plot.SetAxisLimits(cur_lim);
         if (point_cloud.Count > 1)
         {
-            var precision = Math.Min(int.Parse(Tx_Terms_Input.Text),point_cloud.Count);
+            var precision = Math.Min(int.Parse(Tx_Terms_Input.Text), point_cloud.Count);
             FourierApprox fs = new(point_cloud, FourierApprox.transform_type.fast);
             var t1 = W_Plot.Plot.AddFunction(x => fs.Compute(x, precision), Color.Orange);
             t1.Label = "Быстрое преобразование";
@@ -137,7 +134,7 @@ public partial class Approx : Window
                 t2.Color = Color.Orange;
             }
         }
-        
+
         W_Plot.Refresh();
     }
 }

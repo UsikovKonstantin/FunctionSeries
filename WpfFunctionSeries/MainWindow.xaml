@@ -15,7 +15,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="70" />
                 <RowDefinition Height="70" />
-                <RowDefinition Height="110" />
+                <RowDefinition Height="70" />
                 <RowDefinition Height="70" />
                 <RowDefinition Height="70" />
             </Grid.RowDefinitions>
@@ -33,21 +33,26 @@
             </Grid>
 
             <GroupBox Grid.Row="2" Header="Тип разложения функции">
-                <StackPanel Orientation="Vertical" >
-                    <RadioButton Name="Rb_Cos" Content="По косинусам (функция симметрична относительно вертикали)"
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Name="Rb_Cos" Content="Функция четная (по косинусам)"
+                                 VerticalContentAlignment="Center"
                                  Click="General_Calc" />
                     <RadioButton Name="Rb_Sin"
-                                 Content="По синусам (функция симметрична относительно центра координат)"
+                                 Content="Функция нечетная (по синусам)"
+                                 VerticalContentAlignment="Center"
                                  Click="General_Calc" />
                     <RadioButton Name="Rb_Asym" Content="Функция аморфна (не обладает симметрией)" IsChecked="True"
+                                 VerticalContentAlignment="Center"
                                  Click="General_Calc" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="1" Header="Разложения">
                 <StackPanel Orientation="Horizontal">
-                    <RadioButton Name="Rb_Fourier" Content="Разложение в ряд Фурье" Click="General_Calc"
+                    <RadioButton Name="Rb_Fourier" Content="Разложение в ряд Фурье" VerticalContentAlignment="Center"
+                                 Click="General_Calc"
                                  IsChecked="True" />
-                    <RadioButton Name="Rb_Taylor" Content="Разложение в ряд Тейлора" Click="General_Calc" />
+                    <RadioButton Name="Rb_Taylor" Content="Разложение в ряд Тейлора" VerticalContentAlignment="Center"
+                                 Click="General_Calc" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="4" Header="Степень разложения в ряд Тейлора">
@@ -73,7 +78,7 @@
                 </Grid>
             </GroupBox>
         </Grid>
-        <WpfPlot Grid.Row="1" x:Name="W_Plot" AxesChanged="W_Plot_OnAxesChanged"/>
+        <WpfPlot Grid.Row="1" x:Name="W_Plot" AxesChanged="W_Plot_OnAxesChanged" />
         <StackPanel Grid.Row="2" Orientation="Horizontal">
             <Button Name="Bt_Help" Click="Bt_Help_OnClick">
                 <StackPanel Orientation="Horizontal">

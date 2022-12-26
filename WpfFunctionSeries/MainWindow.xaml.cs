@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Threading;
 using FunctionSeriesClassLibrary;
+using ScottPlot;
 
 namespace WpfFunctionSeries;
 
@@ -20,11 +20,15 @@ public partial class MainWindow : Window
     private int prev_scroll_value = 5;
 
     private int prev_scroll_value_Tay = 5;
+    private bool taylor_empty = true;
+
+    private TaylorSeries taylor_saved;
 
     public MainWindow()
     {
         InitializeComponent();
         Set_Up_UI();
+        Tx_Per_Input.Text = (2 * Math.PI).ToString();
     }
 
     private void Scr_Pow_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -45,8 +49,9 @@ public partial class MainWindow : Window
         {
             GBox_Add_fun.Header = "Период функции";
             var t = (Grid)GBox_Add_fun.Parent;
+            Tx_Per_Input.Text = (2 * Math.PI).ToString();
             t.ColumnDefinitions[1].Width = new GridLength(170);
-            Grid_sub.RowDefinitions[2].Height = new GridLength(110);
+            Grid_sub.RowDefinitions[2].Height = new GridLength(70);
             Grid_sub.RowDefinitions[3].Height = new GridLength(70);
             Grid_sub.RowDefinitions[4].Height = new GridLength(0);
             Grid_main.RowDefinitions[0].Height = new GridLength(320);
@@ -55,6 +60,7 @@ public partial class MainWindow : Window
         {
             GBox_Add_fun.Header = "Коэффинциент разложения";
             var t = (Grid)GBox_Add_fun.Parent;
+            Tx_Per_Input.Text = "0";
             t.ColumnDefinitions[1].Width = new GridLength(270);
             Grid_sub.RowDefinitions[2].Height = new GridLength(0);
             Grid_sub.RowDefinitions[3].Height = new GridLength(0);
@@ -97,24 +103,24 @@ public partial class MainWindow : Window
             var cts = new CancellationTokenSource();
             var ts = Task.Run(() =>
             {
-                var ds = this.Dispatcher;
+                var ds = Dispatcher;
                 string fun_text = null;
                 ds.Invoke(() => fun_text = Tx_Fun_Input.Text);
                 double x0 = 0;
                 ds.Invoke(() => x0 = double.Parse(Tx_Per_Input.Text));
-                int n = 5;
+                var n = 5;
                 ds.Invoke(() => n = int.Parse(Tx_Tay_Terms_Input.Text));
-                return new TaylorSeries(fun_text, x0, n, ct:cts.Token);
-            },cts.Token);
-            Stopwatch sw = Stopwatch.StartNew();
-            bool success = false;
+                return new TaylorSeries(fun_text, x0, n, ct: cts.Token);
+            }, cts.Token);
+            var sw = Stopwatch.StartNew();
+            var success = false;
             var tas = Task.Run(() => success = ts.Wait(1000));
             await tas;
             if (success)
             {
                 Scr_Tay_Terms.Background = Brushes.White;
                 Scr_Tay_Terms.ToolTip = "";
-                Update_Plot(ts.Result);    
+                Update_Plot(ts.Result);
             }
             else
             {
@@ -283,17 +289,17 @@ public partial class MainWindow : Window
         W_Plot.Plot.SetAxisLimits(-max_x, max_x, aver - diff, aver + diff);
         var t = cloud_at_range(fs);
         List<double> xs = new(), ys = new();
-        for (int i = 0; i < t.Count; i++)
+        for (var i = 0; i < t.Count; i++)
         {
             xs.Add(t[i].x);
             ys.Add(t[i].y);
         }
 
-        W_Plot.Plot.AddScatter(xs.ToArray(), ys.ToArray(),markerShape:ScottPlot.MarkerShape.none);
+        W_Plot.Plot.AddScatter(xs.ToArray(), ys.ToArray(), markerShape: MarkerShape.none);
         if (!taylor_empty && Tx_Fun_Input.Text == taylor_saved.Function) W_Plot.Plot.SetAxisLimits(lim);
         taylor_saved = fs;
         taylor_empty = false;
-        W_Plot_OnAxesChanged(new(),new());
+        W_Plot_OnAxesChanged(new object(), new EventArgs());
         W_Plot.Refresh();
     }
 
@@ -301,16 +307,18 @@ public partial class MainWindow : Window
     {
         List<(double x, double y)> cloud = new();
         double min_x = W_Plot.Plot.GetAxisLimits().XMin, max_x = W_Plot.Plot.GetAxisLimits().XMax;
-        double aver = (min_x + max_x) / 2;
-        double diff = Math.Abs(aver - min_x);
-        double multiplier = 1.3;
-        min_x = aver - (diff * multiplier); max_x = aver + (diff * multiplier);
+        var aver = (min_x + max_x) / 2;
+        var diff = Math.Abs(aver - min_x);
+        var multiplier = 1.3;
+        min_x = aver - diff * multiplier;
+        max_x = aver + diff * multiplier;
         double min_y = W_Plot.Plot.GetAxisLimits().YMin - 1, max_y = W_Plot.Plot.GetAxisLimits().YMax + 1;
         aver = (min_y + max_y) / 2;
         diff = Math.Abs(aver - min_y);
-        min_y = aver - (diff * multiplier); max_y = aver + (diff * multiplier);
-        double step = (max_x - min_x) / 1000;
-        for (var i = min_x; i <= max_x; i+= step)
+        min_y = aver - diff * multiplier;
+        max_y = aver + diff * multiplier;
+        var step = (max_x - min_x) / 1000;
+        for (var i = min_x; i <= max_x; i += step)
         {
             var val = ts.Compute(i);
             val = Math.Min(Math.Max(min_y, val), max_y);
@@ -319,10 +327,13 @@ public partial class MainWindow : Window
                 if (ts.N % 2 == 0) val = max_y;
                 else val = min_y;
             }
+
             cloud.Add((i, val));
         }
+
         return cloud;
     }
+
     private double call_fun(double x, string polish)
     {
         // Вызывает функцию таким образом, как если бы она была периодической
@@ -456,18 +467,18 @@ public partial class MainWindow : Window
         {
             if (Rb_Sin.IsChecked.Value)
                 new Text_repr(new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
-                        Tx_Fun_Input.Text, FourierSeriesType.Sin)).Show();
+                    Tx_Fun_Input.Text, FourierSeriesType.Sin)).Show();
             if (Rb_Cos.IsChecked.Value)
                 new Text_repr(new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
-                        Tx_Fun_Input.Text, FourierSeriesType.Cos)).Show();
+                    Tx_Fun_Input.Text, FourierSeriesType.Cos)).Show();
             if (Rb_Asym.IsChecked.Value)
                 new Text_repr(new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
-                        Tx_Fun_Input.Text, FourierSeriesType.CosSin)).Show();
+                    Tx_Fun_Input.Text, FourierSeriesType.CosSin)).Show();
         }
         else if (Rb_Taylor.IsChecked.Value)
         {
-            new Text_repr(ts: new TaylorSeries(Tx_Fun_Input.Text, double.Parse(Tx_Per_Input.Text),
-                        int.Parse(Tx_Tay_Terms_Input.Text)))
+            new Text_repr(new TaylorSeries(Tx_Fun_Input.Text, double.Parse(Tx_Per_Input.Text),
+                    int.Parse(Tx_Tay_Terms_Input.Text)))
                 .Show();
         }
     }
@@ -483,8 +494,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private TaylorSeries taylor_saved;
-    private bool taylor_empty = true;
     private void W_Plot_OnAxesChanged(object? sender, EventArgs e)
     {
         if (!IsInitialized) return;
@@ -497,13 +506,13 @@ public partial class MainWindow : Window
             x => Interpreter.SolvePolishExpression(pol, new Dictionary<char, double> { { 'x', x } }));
         var t = cloud_at_range(taylor_saved);
         List<double> xs = new(), ys = new();
-        for (int i = 0; i < t.Count; i++)
+        for (var i = 0; i < t.Count; i++)
         {
             xs.Add(t[i].x);
             ys.Add(t[i].y);
         }
 
-        W_Plot.Plot.AddScatter(xs.ToArray(), ys.ToArray(),markerShape:ScottPlot.MarkerShape.none);
+        W_Plot.Plot.AddScatter(xs.ToArray(), ys.ToArray(), markerShape: MarkerShape.none);
         W_Plot.Plot.SetAxisLimits(lim);
     }
 }

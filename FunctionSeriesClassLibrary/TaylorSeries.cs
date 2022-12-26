@@ -38,13 +38,13 @@ namespace FunctionSeriesClassLibrary
         /// <param name="function"> заданная функция </param>
         /// <param name="x0"> x0 </param>
         /// <param name="n"> кол-во коэффициентов в ряде </param>
-        public TaylorSeries(string function, double x0, int n, CancellationToken ct = new()) 
+        public TaylorSeries(string function, double x0, int n, bool computeCoefs = true, CancellationToken ct = new()) 
         {
             this.function = function;
             this.x0 = x0;
             coefs = new double[n + 1];
             this.n = n;
-            FindCoefs(ct);
+            if (computeCoefs) FindCoefs(ct);
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace FunctionSeriesClassLibrary
             double[] coefs = new double[n + 1];
             for (int i = 0; i < t1.Coefs.Length; i++) coefs[i] += t1.Coefs[i];
             for (int i = 0; i < t2.Coefs.Length; i++) coefs[i] += t2.Coefs[i];
-            TaylorSeries res = new TaylorSeries(function, t1.X0, n);
+            TaylorSeries res = new TaylorSeries(function, t1.X0, n, false);
             res.coefs = coefs;
             return res;
         }

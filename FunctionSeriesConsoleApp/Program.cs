@@ -76,7 +76,11 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 //FourierSeries fs = new FourierSeries(new double[] { 1, 2, 4, -5}, new double[] { 1, 2, 4, -5 }, 5, FourierSeriesType.CosSin);
 //Console.WriteLine(fs);
 
-TaylorSeries t = new TaylorSeries("cos(x)", 0, 5);
-Console.WriteLine(t);
-Console.WriteLine(t.GetIntegral());
-Console.WriteLine(t.GetIntegral().GetDerivative());
+//TaylorSeries t = new TaylorSeries("cos(x)", 0, 5);
+//Console.WriteLine(t);
+//Console.WriteLine(t.GetIntegral());
+//Console.WriteLine(t.GetIntegral().GetDerivative());
+TaylorSeries test = new TaylorSeries("cos(x)", 0, 5);
+TaylorSeries test2 = new TaylorSeries("cos(x)", 0, 5);
+var test3 = test + test2;
+Console.WriteLine(test3);

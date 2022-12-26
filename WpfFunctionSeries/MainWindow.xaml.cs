@@ -213,20 +213,23 @@ public partial class MainWindow : Window
             }
         }
 
-        var minus_counter = 0;
         if (symbols.Count != 0)
         {
-            if (symbols[0] != '-') minus_counter = 1;
-            for (var index = 0; index < symbols.Count; index++)
+            var minus_counter = 0;
+            if (symbols.Count != 0)
             {
-                var chars = symbols[index];
-                if (chars == '-')
+                if (symbols[0] != '-') minus_counter = 1;
+                for (var index = 0; index < symbols.Count; index++)
                 {
-                    minus_counter++;
-                    if (minus_counter >= 2)
+                    var chars = symbols[index];
+                    if (chars == '-')
                     {
-                        symbols.RemoveAt(index);
-                        index--;
+                        minus_counter++;
+                        if (minus_counter >= 2)
+                        {
+                            symbols.RemoveAt(index);
+                            index--;
+                        }
                     }
                 }
             }
@@ -234,11 +237,13 @@ public partial class MainWindow : Window
         //Замена текущей строки на корректную
         string corr = new(symbols.ToArray());
         if (corr.Length == 0) corr = "0";
+        if (corr == "-") corr = "0";
         Tx_Per_Input.Text = corr;
     }
 
     private void Update_Plot(FourierSeries fs)
     {
+        taylor_empty = true;
         // Работа с графиком
         W_Plot.Plot.Clear();
         var pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
@@ -258,6 +263,7 @@ public partial class MainWindow : Window
             max_y = Math.Max(val2, max_y);
         }
 
+        if (min_y == double.NegativeInfinity)W_Plot.Plot.Clear();
         var aver = (max_y + min_y) / 2;
         var diff = Math.Abs(aver - max_y) * 1.1;
         if (diff < 0.000001) diff = 1;
@@ -343,6 +349,7 @@ public partial class MainWindow : Window
     {
         // Вызывает функцию таким образом, как если бы она была периодической
         var period = double.Parse(Tx_Per_Input.Text);
+        if (period == 0) return double.NegativeInfinity;
         if (Rb_Asym.IsChecked.Value) x -= Math.Round(x / period) * period;
         if (Rb_Sin.IsChecked.Value)
         {
@@ -417,8 +424,8 @@ public partial class MainWindow : Window
 
         //Замена текущей строки на корректную
         string corr = new(symbols.ToArray());
-        if (corr.Length == 0) corr = $"3{CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator}14";
-        if (corr == "0") corr = $"3{CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator}14";
+        if (corr.Length == 0) corr = (2 * Math.PI).ToString();
+        if (corr == "0") corr = (2 * Math.PI).ToString();
         Tx_Per_Input.Text = corr;
     }
 

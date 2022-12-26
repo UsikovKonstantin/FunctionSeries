@@ -73,5 +73,10 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 //Console.WriteLine(FunctionHelper.GetType("e^x"));
 //Console.WriteLine(FunctionHelper.GetType("x^2 + x"));
 
-FourierSeries fs = new FourierSeries(new double[] { 1, 2, 4, -5}, new double[] { 1, 2, 4, -5 }, 5, FourierSeriesType.CosSin);
-Console.WriteLine(fs);
+//FourierSeries fs = new FourierSeries(new double[] { 1, 2, 4, -5}, new double[] { 1, 2, 4, -5 }, 5, FourierSeriesType.CosSin);
+//Console.WriteLine(fs);
+
+TaylorSeries t = new TaylorSeries("cos(x)", 0, 5);
+Console.WriteLine(t);
+Console.WriteLine(t.GetIntegral());
+Console.WriteLine(t.GetIntegral().GetDerivative());

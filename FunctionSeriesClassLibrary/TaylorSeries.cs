@@ -60,6 +60,19 @@ namespace FunctionSeriesClassLibrary
         }
 
         /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="x0"> x0 </param>
+        /// <param name="n"> кол-во коэффициентов в ряде </param>
+        /// <param name="coefs"> коэффициенты ряда </param>
+        public TaylorSeries(double x0, int n, double[] coefs)
+        {
+            this.x0 = x0;
+            this.coefs = coefs;
+            this.n = n;
+        }
+
+        /// <summary>
         /// Найти все коэфициенты ряда
         /// </summary>
         private void FindCoefs(CancellationToken ct = new())
@@ -156,8 +169,7 @@ namespace FunctionSeriesClassLibrary
             {
                 newCoefs[i - 1] = coefs[i] * i;
             }
-            TaylorSeries newTaylorSeries = new TaylorSeries($"d({function})/dx", x0, n);
-            newTaylorSeries.coefs = newCoefs;
+            TaylorSeries newTaylorSeries = new TaylorSeries(x0, n, newCoefs);
             return newTaylorSeries;
         }
 
@@ -172,8 +184,7 @@ namespace FunctionSeriesClassLibrary
             {
                 newCoefs[i + 1] = coefs[i] / (i + 1);
             }
-            TaylorSeries newTaylorSeries = new TaylorSeries($"∫({function})dx", x0, n);
-            newTaylorSeries.coefs = newCoefs;
+            TaylorSeries newTaylorSeries = new TaylorSeries(x0, n, newCoefs);
             return newTaylorSeries;
         }
         #endregion

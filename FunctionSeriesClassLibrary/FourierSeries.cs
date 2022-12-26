@@ -134,6 +134,27 @@
                     b[i] = ONE_DIV_L * Integral(string.Format(polSin, i * PI_DIV_L), -l, l, STEPS);
                 });
         }
+
+        /// <summary>
+        /// Вычисление интеграла.
+        /// </summary>
+        /// <param name="polFunc"> польская запись функции </param>
+        /// <param name="a"> начальный предел интегрирования </param>
+        /// <param name="b"> конечный предел интегрирования </param>
+        /// <param name="steps"> количество шагов </param>
+        /// <returns> значение интеграла </returns>
+        public double Integral(string polFunc, double a, double b, int steps)
+        {
+            double step = (b - a) / steps;  // ширина шага
+            double res = 0;
+            double[] values = new double[steps + 1];
+            Parallel.For(0, steps + 1, i =>
+                values[i] = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', a + step * i } }));
+            for (int i = 0; i < steps; i++)
+                res += values[i] + values[i + 1];
+            res *= 0.5 * step;
+            return res;
+        }
         #endregion
 
         #region Переопределение ToString()
@@ -215,27 +236,6 @@
                 double c = i * k;
                 res += a[i] * Math.Cos(c) + b[i] * Math.Sin(c);
             }
-            return res;
-        }
-
-        /// <summary>
-        /// Вычисление интеграла.
-        /// </summary>
-        /// <param name="polFunc"> польская запись функции </param>
-        /// <param name="a"> начальный предел интегрирования </param>
-        /// <param name="b"> конечный предел интегрирования </param>
-        /// <param name="steps"> количество шагов </param>
-        /// <returns> значение интеграла </returns>
-        public double Integral(string polFunc, double a, double b, int steps)
-        {
-            double step = (b - a) / steps;  // ширина шага
-            double res = 0;
-            double[] values = new double[steps + 1];
-            Parallel.For(0, steps + 1, i =>
-                values[i] = Interpreter.SolvePolishExpression(polFunc, new Dictionary<char, double> { { 'x', a + step * i } }));
-            for (int i = 0; i < steps; i++)
-                res += values[i] + values[i + 1];
-            res *= 0.5 * step;
             return res;
         }
 

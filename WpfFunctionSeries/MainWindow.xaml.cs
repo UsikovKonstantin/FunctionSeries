@@ -145,7 +145,7 @@ public partial class MainWindow : Window
 
     private void set_Fun_type()
     {
-        var type = FunctionHelper.GetType(Tx_Fun_Input.Text);
+        var type = FunctionHelper.GetType(fn_text);
         switch (type)
         {
             case FunctionType.Even:
@@ -489,17 +489,17 @@ public partial class MainWindow : Window
         {
             if (Rb_Sin.IsChecked.Value)
                 new Text_repr(new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
-                    Tx_Fun_Input.Text, FourierSeriesType.Sin)).Show();
+                    fn_text, FourierSeriesType.Sin)).Show();
             if (Rb_Cos.IsChecked.Value)
                 new Text_repr(new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
-                    Tx_Fun_Input.Text, FourierSeriesType.Cos)).Show();
+                    fn_text, FourierSeriesType.Cos)).Show();
             if (Rb_Asym.IsChecked.Value)
                 new Text_repr(new FourierSeries(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text),
-                    Tx_Fun_Input.Text, FourierSeriesType.CosSin)).Show();
+                    fn_text, FourierSeriesType.CosSin)).Show();
         }
         else if (Rb_Taylor.IsChecked.Value)
         {
-            new Text_repr(new TaylorSeries(Tx_Fun_Input.Text, double.Parse(Tx_Per_Input.Text),
+            new Text_repr(new TaylorSeries(fn_text, double.Parse(Tx_Per_Input.Text),
                     int.Parse(Tx_Tay_Terms_Input.Text)))
                 .Show();
         }

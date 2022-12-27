@@ -26,6 +26,7 @@ public partial class MainWindow : Window
     private bool fourier_empty = true;
     private string fourier_saved;
 
+    private string fn_text = "";
     public MainWindow()
     {
         InitializeComponent();
@@ -98,6 +99,7 @@ public partial class MainWindow : Window
 
         string function = Tx_Fun_Input.Text;
         function = function.Replace("x!", "((sqrt(2*π*x))*((x/e)^x))");
+        fn_text = function;
         if (Rb_Fourier.IsChecked.Value)
         {
             checks_terms();
@@ -106,7 +108,7 @@ public partial class MainWindow : Window
             if (Rb_Cos.IsChecked.Value) type = FourierSeriesType.Cos;
             else if (Rb_Sin.IsChecked.Value) type = FourierSeriesType.Sin;
             else type = FourierSeriesType.CosSin;
-            FourierSeries fs = new(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text), function,
+            FourierSeries fs = new(int.Parse(Tx_Terms_Input.Text), double.Parse(Tx_Per_Input.Text), fn_text,
                 type);
             Update_Plot(fs);
         }
@@ -122,7 +124,7 @@ public partial class MainWindow : Window
                 ds.Invoke(() => x0 = double.Parse(Tx_Per_Input.Text));
                 var n = 5;
                 ds.Invoke(() => n = int.Parse(Tx_Tay_Terms_Input.Text));
-                return new TaylorSeries(function, x0, n, ct: cts.Token);
+                return new TaylorSeries(fn_text, x0, n, ct: cts.Token);
             }, cts.Token);
             var success = false;
             await Task.Run(() => success = ts.Wait(1000), cts.Token);
@@ -249,7 +251,7 @@ public partial class MainWindow : Window
         var lim = W_Plot.Plot.GetAxisLimits();
         // Работа с графиком
         W_Plot.Plot.Clear();
-        var pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
+        var pol = Interpreter.GetPolishExpression(fn_text);
         W_Plot.Plot.AddFunction(x => call_fun(x, pol));
         W_Plot.Plot.AddFunction(x => fs.Compute(x));
         // постановка более удобных границ графика
@@ -284,7 +286,7 @@ public partial class MainWindow : Window
         var lim = W_Plot.Plot.GetAxisLimits();
         W_Plot.Plot.Clear();
         if (!taylor_empty && Tx_Fun_Input.Text == taylor_saved.Function) W_Plot.Plot.SetAxisLimits(lim);
-        var pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
+        var pol = Interpreter.GetPolishExpression(fn_text);
         W_Plot.Plot.AddFunction(
             x => Interpreter.SolvePolishExpression(pol, new Dictionary<char, double> { { 'x', x } }));
         // постановка более удобных границ графика
@@ -521,7 +523,7 @@ public partial class MainWindow : Window
         var lim = W_Plot.Plot.GetAxisLimits();
         W_Plot.Plot.Clear();
         W_Plot.Plot.SetAxisLimits(lim);
-        var pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
+        var pol = Interpreter.GetPolishExpression(fn_text);
         W_Plot.Plot.AddFunction(
             x => Interpreter.SolvePolishExpression(pol, new Dictionary<char, double> { { 'x', x } }));
         var t = cloud_at_range(taylor_saved);

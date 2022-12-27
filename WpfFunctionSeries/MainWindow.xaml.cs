@@ -18,11 +18,13 @@ namespace WpfFunctionSeries;
 public partial class MainWindow : Window
 {
     private int prev_scroll_value = 5;
-
     private int prev_scroll_value_Tay = 5;
+    
     private bool taylor_empty = true;
-
     private TaylorSeries taylor_saved;
+    
+    private bool fourier_empty = true;
+    private string fourier_saved;
 
     public MainWindow()
     {
@@ -244,6 +246,7 @@ public partial class MainWindow : Window
     private void Update_Plot(FourierSeries fs)
     {
         taylor_empty = true;
+        var lim = W_Plot.Plot.GetAxisLimits();
         // Работа с графиком
         W_Plot.Plot.Clear();
         var pol = Interpreter.GetPolishExpression(Tx_Fun_Input.Text);
@@ -268,12 +271,16 @@ public partial class MainWindow : Window
         var diff = Math.Abs(aver - max_y) * 1.1;
         if (diff < 0.000001) diff = 1;
         W_Plot.Plot.SetAxisLimits(-max_x * 3, max_x * 3, aver - diff, aver + diff);
+        if (!fourier_empty && Tx_Fun_Input.Text == fourier_saved) W_Plot.Plot.SetAxisLimits(lim);
+        fourier_saved = Tx_Fun_Input.Text;
+        fourier_empty = false;
         W_Plot.Refresh();
     }
 
     private void Update_Plot(TaylorSeries fs)
     {
         // Работа с графиком
+        fourier_empty = true;
         var lim = W_Plot.Plot.GetAxisLimits();
         W_Plot.Plot.Clear();
         if (!taylor_empty && Tx_Fun_Input.Text == taylor_saved.Function) W_Plot.Plot.SetAxisLimits(lim);
